@@ -9,7 +9,6 @@ import (
 
 type mqttMessenger struct {
 	client mq.Client
-	recv   chan Message
 }
 
 type handler struct {
@@ -118,10 +117,9 @@ func (h *handler) onConnectionLost(c mq.Client, e error) {
 //
 // It allows for publishing messages to a topic on an MQTT broker, to
 // subscribe to messages published to topics and to unsubscribe from topic.
-func NewMQTTMessenger(client mq.Client, recv chan Message) PublishSubscriber {
+func NewMQTTMessenger(client mq.Client) PublishSubscriber {
 	return &mqttMessenger{
 		client: client,
-		recv:   recv,
 	}
 }
 
@@ -136,9 +134,9 @@ func (m *mqttMessenger) Publish(topic string, msg []byte, qos int, retain bool) 
 // Subscribe subscribes to the specified topic with a certain qos. The topic
 // and message are then passed into this messenger's recv channel and can be
 // read from by any interested consumer.
-func (m *mqttMessenger) Subscribe(topic string, qos int) {
+func (m *mqttMessenger) Subscribe(topic string, qos int, callback func(Message)) {
 	m.client.Subscribe(topic, byte(qos), func(c mq.Client, msg mq.Message) {
-		m.recv <- msg
+		callback(msg)
 	})
 }
 

@@ -17,4 +17,5 @@
 vendor/
 
 # Binary
+hemtjanst
 cmd/hemtjanst

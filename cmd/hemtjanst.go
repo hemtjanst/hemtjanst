@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"git.neotor.se/daenney/hemtjanst/device"
 	"git.neotor.se/daenney/hemtjanst/messaging"
 	"github.com/satori/go.uuid"
 	flag "github.com/spf13/pflag"
 	"log"
 	"os"
 	"os/signal"
-	//"strings"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -58,16 +59,24 @@ func main() {
 		}
 	}()
 
+	manager := device.NewManager(messaging.NewMQTTMessenger(c))
+
 loop:
 	for {
 		select {
-		case msg := <-announce:
-			log.Print(msg)
-		case msg := <-leave:
-			log.Print(msg)
 		case sig := <-quit:
 			log.Printf("Received signal: %s, proceeding to shutdown", sig)
 			break loop
+		case msg := <-announce:
+			newReg := string(msg)
+			log.Print("New announcement: ", newReg)
+			if !strings.Contains(newReg, "/") {
+				// We expect topics we care about to contain at least 1 /
+				break
+			}
+			manager.Add(newReg)
+		case msg := <-leave:
+			manager.Remove(string(msg))
 		}
 	}
 

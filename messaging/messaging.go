@@ -7,7 +7,7 @@ type Publisher interface {
 
 // Subscriber receives messages from a transport
 type Subscriber interface {
-	Subscribe(source string, qos int)
+	Subscribe(source string, qos int, callback func(Message))
 	Unsubscribe(sources ...string)
 }
 
