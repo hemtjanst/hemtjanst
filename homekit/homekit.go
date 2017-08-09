@@ -2,7 +2,6 @@ package homekit
 
 import (
 	"github.com/brutella/hc"
-	"github.com/brutella/hc/accessory"
 	lg "github.com/brutella/hc/log"
 	"log"
 )
