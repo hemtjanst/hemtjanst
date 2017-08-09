@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"git.neotor.se/daenney/hemtjanst/device"
+	"git.neotor.se/daenney/hemtjanst/homekit"
 	"git.neotor.se/daenney/hemtjanst/messaging"
 	"github.com/satori/go.uuid"
 	flag "github.com/spf13/pflag"
@@ -60,6 +61,11 @@ func main() {
 	}()
 
 	manager := device.NewManager(messaging.NewMQTTMessenger(c))
+	log.Print("Started device manager")
+	go func() {
+		homekit.New()
+	}()
+	log.Print("Started HomeKit bridge")
 
 loop:
 	for {
