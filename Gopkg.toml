@@ -1,4 +1,8 @@
 [[constraint]]
+  branch = "master"
+  name = "github.com/brutella/hc"
+
+[[constraint]]
   name = "github.com/eclipse/paho.mqtt.golang"
   version = "1.1.0"
 
