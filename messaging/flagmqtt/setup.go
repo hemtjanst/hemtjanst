@@ -27,7 +27,7 @@ func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 	if val, ok := os.LookupEnv("MQTT_TLS"); ok {
 		useTls = val != "0" && val != "" && strings.ToLower(val) != "false"
 	}
-	if *mqttTLSFlag {
+	if *MqttTLSFlag {
 		useTls = true
 	}
 
@@ -59,7 +59,7 @@ func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 		clientId = rndUuid.String()
 	}
 
-	pts := mq.NewClientOptions().
+	opts := mq.NewClientOptions().
 		AddBroker(fmt.Sprintf("tcp://%s", address)).
 		SetClientID(clientId).
 		SetConnectTimeout(time.Duration(connectionTimeout) * time.Second).
