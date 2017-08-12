@@ -70,14 +70,12 @@ This `meta` topic is a JSON object serialised as a string that contains any
 additional information needed for Hemtjänst to do its thing and generate
 HomeKit accessories.
 
-Though the `meta` format borrows heavily from Apple's HomeKit spec it is
-supposed to be usable for integrations beyond HomeKit and mostly specifies a
-mapping between our format and HomeKit services and characteristics. By
-updating that mapping it should be possible to integrate SmartThings and other
-home automation/IoT bridges and platforms.
+As it currently stands the `meta` topic types and features follow the exact
+names in the HomeKit specification. To support another platform like
+SmartThings a similar mapping would need to be created.
 
 The `meta` document contains a number of required and optional entries. The
-required ones are: `name`, `device`, `feature`. The rest is optional.
+required ones are: `name`, `type`, `feature`. The rest is optional.
 
 Optional keys are: `lastWillID`.
 
@@ -93,21 +91,21 @@ something else entirely. This will be the name of the accessory as HomeKit sees
 it so do pick something that makes sense and allows you to relatively easily
 identify the accessory.
 
-### `device`
+### `type`
 
 The type of device, for example `light` or `CO2Sensor`. These map directly onto
 HomeKit services and are considered the "primary" service. There is currently no
 support for hidden, secondary or linked services.
 
-The [Mapping][mapping] file contains a list of device types and which HomeKit
-service maps to it.
+You can find the supported devices [here][types] and how they map to HomeKit
+services.
 
 ### `feature`
 
 Every device needs at least one feature to be defined for it, the usual
 required characteristic (it can be more than one). Similarly to device the
-[Mapping][mapping] contains a list of which feature names map to what HomeKit
-characteristics.
+[characteristics][characteristics] mapping contains a list of which feature
+names map to what HomeKit characteristics.
 
 A feature is an object itself, which can be empty, in which case the defaults
 apply for the `min`, `max` and `step` value as defined in the HomeKit spec. In
@@ -180,5 +178,5 @@ or closed (as part of a security system for example) can be defined like this:
 ```
 
 [json-style]: https://google.github.io/styleguide/jsoncstyleguide.xml
-[mapping]: (mapping/mapping.md)
-[mapping-json]: (mapping/mapping.json)
+[types]: (hemtjanst/homekit/util/service.go)
+[characteristics]: (hemtjanst/homekit/util/characteristic.go)

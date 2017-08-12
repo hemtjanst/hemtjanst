@@ -12,7 +12,7 @@ type Device struct {
 	Manufacturer string              `json:"manufacturer"`
 	Model        string              `json:"model"`
 	SerialNumber string              `json:"serialNumber"`
-	Type         string              `json:"device"`
+	Type         string              `json:"type"`
 	LastWillID   string              `json:"lastWillID,omitempty"`
 	Features     map[string]*Feature `json:"feature"`
 	transport    messaging.PublishSubscriber
