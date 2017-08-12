@@ -19,7 +19,8 @@ import (
 
 var (
 	addr = flag.String("address", "127.0.0.1", "IP or hostname for Hemtjänst to bind on")
-	port = flag.Int("port", 1234, "Port for Hemtjänst to bind on")
+	port = flag.String("port", "12345", "Port for Hemtjänst to bind on")
+	pin  = flag.String("pin", "01020304", "Pairing pin for the HomeKit bridge")
 )
 
 func main() {
@@ -38,8 +39,8 @@ func main() {
 	leave := make(chan []byte)
 
 	bridgeConfig := bridge.Config{
-		Pin:         "01020304",
-		Port:        "12345",
+		Pin:         *pin,
+		Port:        *port,
 		StoragePath: "./db",
 	}
 	bridgeInfo := accessory.Info{
@@ -59,6 +60,7 @@ func main() {
 		OnConnectHandler:        handler.OnConnect,
 		OnConnectionLostHandler: handler.OnConnectionLost,
 		WillTopic:               "leave",
+		WillPayload:             "hemtjanst",
 		WillRetain:              false,
 		WillQoS:                 0,
 	}
