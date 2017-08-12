@@ -21,7 +21,7 @@ func envOrFlagInt(flagVal int, envName string, defVal int) (ret int) {
 	ret = defVal
 
 	if val, ok := os.LookupEnv(envName); ok {
-		ret, _ = strconv.Itoa(val)
+		ret, _ = strconv.Atoi(val)
 	}
 	if flagVal != defVal {
 		ret = flagVal
