@@ -14,11 +14,13 @@ import (
 )
 
 type ClientConfig struct {
-	WillTopic   string
-	WillPayload string
-	WillQoS     int
-	WillRetain  bool
-	ClientID    string
+	WillTopic               string
+	WillPayload             string
+	WillQoS                 int
+	WillRetain              bool
+	ClientID                string
+	OnConnectHandler        func(mq.Client)
+	OnConnectionLostHandler func(mq.Client, error)
 }
 
 func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
@@ -69,6 +71,14 @@ func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 		SetPingTimeout(time.Duration(pingTimeout) * time.Second).
 		SetProtocolVersion(4).
 		SetWriteTimeout(time.Duration(writeTimeout) * time.Second)
+
+	if config.OnConnectHandler != nil {
+		opts.SetOnConnectHandler(config.OnConnectHandler)
+	}
+
+	if config.OnConnectionLostHandler != nil {
+		opts.SetConnectionLostHandler(config.OnConnectionLostHandler)
+	}
 
 	if config.WillTopic != "" {
 		opts.SetWill(
