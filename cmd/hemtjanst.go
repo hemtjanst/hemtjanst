@@ -1,14 +1,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/brutella/hc/accessory"
 	"github.com/hemtjanst/hemtjanst/device"
 	"github.com/hemtjanst/hemtjanst/homekit"
 	"github.com/hemtjanst/hemtjanst/homekit/bridge"
 	"github.com/hemtjanst/hemtjanst/messaging"
-	"github.com/satori/go.uuid"
-	flag "github.com/spf13/pflag"
+	"github.com/hemtjanst/hemtjanst/messaging/flagmqtt"
 	"log"
 	"os"
 	"os/signal"
@@ -18,15 +18,8 @@ import (
 )
 
 var (
-	addr             = flag.StringP("address", "a", "127.0.0.1", "IP or hostname for Hemtjänst to bind on")
-	port             = flag.IntP("port", "p", 1234, "Port for Hemtjänst to bind on")
-	bAddr            = flag.String("broker.address", "127.0.0.1", "IP or hostname of the MQTT broker")
-	bPort            = flag.Int("broker.port", 1883, "Port the MQTT broker listens on")
-	cTimeout         = flag.Int("broker.connection-timeout", 10, "Connection timeout in seconds")
-	keepAlive        = flag.Int("broker.keepalive", 5, "Time in seconds between each PING packet")
-	maxReconInterval = flag.Int("broker.max-reconnect-interval", 2, "Maximum time in minutes to wait between reconnect attemps")
-	pTimeout         = flag.Int("broker.ping-timeout", 10, "Time in seconds after which a ping times out")
-	wTimeout         = flag.Int("broker.write-timeout", 5, "Time in seconds after which a write will time out")
+	addr = flag.String("address", "127.0.0.1", "IP or hostname for Hemtjänst to bind on")
+	port = flag.Int("port", 1234, "Port for Hemtjänst to bind on")
 )
 
 func main() {
@@ -37,7 +30,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\n")
 	}
 	flag.Parse()
-	uid := uuid.NewV4()
 
 	log.Print("Initialing Hemtjänst")
 	quit := make(chan os.Signal)
@@ -58,16 +50,21 @@ func main() {
 	}
 
 	log.Print("Attempting to connect to MQTT broker")
-	c := messaging.NewMQTTClient(
-		announce, leave,
-		*bAddr, *bPort,
-		time.Duration(*cTimeout),
-		time.Duration(*keepAlive),
-		time.Duration(*maxReconInterval),
-		time.Duration(*pTimeout),
-		time.Duration(*wTimeout),
-		uid.String(),
-	)
+	handler := &messaging.Handler{}
+	conf := flagmqtt.ClientConfig{
+		ClientID:                "hemtjanst",
+		OnConnectHandler:        handler.OnConnect,
+		OnConnectionLostHandler: handler.OnConnectionLost,
+		WillTopic:               "leave",
+		WillRetain:              false,
+		WillQoS:                 0,
+	}
+
+	c, err := flagmqtt.NewPersistentMqtt(conf)
+	if err != nil {
+		log.Fatal("Could not configure the MQTT client: ", err)
+	}
+
 	go func() {
 		if token := c.Connect(); token.Wait() && token.Error() != nil {
 			log.Fatal("Failed to establish connection with broker: ", token.Error())

@@ -11,7 +11,7 @@ type mqttMessenger struct {
 	client mq.Client
 }
 
-type handler struct {
+type Handler struct {
 	ann   chan []byte
 	leave chan []byte
 }
@@ -39,43 +39,9 @@ func RetryWithBackoff(attempts int, backoff time.Duration, callback func() error
 	return fmt.Errorf("Operation failed after %d attempts, last error: %s", attempts, err)
 }
 
-// NewMQTTClient configues an MQTT client according to our needs. This
-// client can then be passed to NewMQTTMessenger.
-func NewMQTTClient(
-	announce chan []byte,
-	leave chan []byte,
-	addr string,
-	port int,
-	connectTimeout time.Duration,
-	keepAlive time.Duration,
-	maxReconnectInterval time.Duration,
-	pingTimeout time.Duration,
-	writeTimeout time.Duration,
-	identifier string,
-) mq.Client {
-	h := &handler{
-		ann:   announce,
-		leave: leave,
-	}
-	opts := mq.NewClientOptions().
-		AddBroker(fmt.Sprintf("tcp://%s:%d", addr, port)).
-		SetClientID("hemtjänst").
-		SetConnectTimeout(connectTimeout*time.Second).
-		SetKeepAlive(keepAlive*time.Second).
-		SetMaxReconnectInterval(maxReconnectInterval*time.Minute).
-		SetMessageChannelDepth(100).
-		SetPingTimeout(pingTimeout*time.Second).
-		SetProtocolVersion(4).
-		SetWill("leave", identifier, 0, false).
-		SetWriteTimeout(writeTimeout * time.Second).
-		SetOnConnectHandler(h.onConnect).
-		SetConnectionLostHandler(h.onConnectionLost)
-	return mq.NewClient(opts)
-}
-
 // onConnect gets executed when we've established a connection with the MQTT
 // broker, regardless of if this was our first attempt or after a reconnect.
-func (h *handler) onConnect(c mq.Client) {
+func (h *Handler) OnConnect(c mq.Client) {
 	log.Print("Connected to MQTT broker")
 
 	log.Print("Attempting to subscribe to announce topic")
@@ -118,7 +84,7 @@ func (h *handler) onConnect(c mq.Client) {
 
 // onConnectionLost gets triggered whenver we unexpectedly lose connection with
 // the MQTT broker.
-func (h *handler) onConnectionLost(c mq.Client, e error) {
+func (h *Handler) OnConnectionLost(c mq.Client, e error) {
 	log.Print("Unexpectedly lost connection to MQTT broker, attempting to reconnect")
 }
 
