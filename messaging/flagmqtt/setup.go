@@ -102,6 +102,13 @@ func NewPersistentMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 	return mq.NewClient(opts), nil
 }
 
+// NewUniqueIdentifier returns a unique identifier that the client can use.
+// This identifier is what should be set for the lastWillID for anything
+// that is bridging more than one device
+func NewUniqueIdentifier() string {
+	return uuid.NewV4().String()
+}
+
 func setupTLS(caPath, certPath, keyPath string) (*tls.Config, error) {
 	tlsCfg := &tls.Config{}
 	if caPath != "" {
