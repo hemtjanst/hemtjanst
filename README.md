@@ -178,5 +178,5 @@ or closed (as part of a security system for example) can be defined like this:
 ```
 
 [json-style]: https://google.github.io/styleguide/jsoncstyleguide.xml
-[types]: (hemtjanst/homekit/util/service.go)
-[characteristics]: (hemtjanst/homekit/util/characteristic.go)
+[types]: homekit/util/service.go
+[characteristics]: homekit/util/characteristic.go
