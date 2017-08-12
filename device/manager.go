@@ -71,6 +71,12 @@ func (m *Manager) Get(id string) (*Device, error) {
 	return nil, fmt.Errorf("Unknown device %s", id)
 }
 
+func (m *Manager) GetAll() map[string]*Device {
+	m.RLock()
+	defer m.RUnlock()
+	return m.devices
+}
+
 func (m *Manager) Remove(msg string) {
 	log.Print("Attempting to remove device ", msg)
 	m.Lock()
