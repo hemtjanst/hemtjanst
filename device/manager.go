@@ -8,20 +8,32 @@ import (
 	"sync"
 )
 
+type DeviceHandler interface {
+	DeviceUpdated(*Device)
+	DeviceLeave(*Device)
+	DeviceRemoved(*Device)
+}
+
 type Manager struct {
-	devices map[string]*Device
-	client  messaging.PublishSubscriber
+	devices  map[string]*Device
+	handlers []DeviceHandler
+	client   messaging.PublishSubscriber
 	sync.RWMutex
 }
 
 func NewManager(c messaging.PublishSubscriber) *Manager {
 	return &Manager{
-		client:  c,
-		devices: make(map[string]*Device, 10),
+		client:   c,
+		devices:  make(map[string]*Device, 10),
+		handlers: []DeviceHandler{},
 	}
 }
 
 func (m *Manager) Add(topic string) {
+	if _, ok := m.devices[topic]; ok {
+		log.Print("Got announce for existing device ", topic)
+		return
+	}
 	log.Print("Going to add device ", topic)
 	dev := &Device{Topic: topic, transport: m.client}
 	m.client.Subscribe(fmt.Sprintf("%s/meta", topic), 1, func(msg messaging.Message) {
@@ -38,6 +50,10 @@ func (m *Manager) Add(topic string) {
 				ft.GetTopic = fmt.Sprintf("%s/%s/get", topic, name)
 			}
 		}
+
+		go m.forHandler(func(handler DeviceHandler) {
+			handler.DeviceUpdated(dev)
+		})
 	})
 
 	m.Lock()
@@ -62,9 +78,14 @@ func (m *Manager) Remove(msg string) {
 	if val, ok := m.devices[msg]; ok {
 		log.Print("Found device, unsubscribing and removing")
 		m.client.Unsubscribe(fmt.Sprintf("%s/meta", msg))
-		for f, _ := range val.Features {
-			m.client.Unsubscribe(fmt.Sprintf("%s/%s/get", msg, f))
+		for _, ft := range val.Features {
+			m.client.Unsubscribe(ft.GetTopic)
 		}
+
+		go m.forHandler(func(handler DeviceHandler) {
+			handler.DeviceLeave(val)
+		})
+
 		delete(m.devices, msg)
 		return
 	}
@@ -74,4 +95,21 @@ func (m *Manager) Remove(msg string) {
 			m.Remove(d.Topic)
 		}
 	}
+}
+
+func (m *Manager) forHandler(f func(handler DeviceHandler)) {
+	for _, h := range m.handlers {
+		f(h)
+	}
+}
+
+func (m *Manager) AddHandler(handler DeviceHandler) {
+	m.Lock()
+	defer m.Unlock()
+	m.handlers = append(m.handlers, handler)
+	go func() {
+		for _, device := range m.devices {
+			handler.DeviceUpdated(device)
+		}
+	}()
 }
