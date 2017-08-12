@@ -23,7 +23,7 @@ type ClientConfig struct {
 	OnConnectionLostHandler func(mq.Client, error)
 }
 
-func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
+func NewPersistentMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 	useTls := false
 
 	if val, ok := os.LookupEnv("MQTT_TLS"); ok {
