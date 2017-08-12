@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hemtjanst/hemtjanst/messaging"
-	"github.com/satori/go.uuid"
 )
 
 type Device struct {
@@ -14,7 +13,7 @@ type Device struct {
 	Model        string              `json:"model"`
 	SerialNumber string              `json:"serialNumber"`
 	Type         string              `json:"device"`
-	LastWillID   uuid.UUID           `json:"lastWillID,omitempty"`
+	LastWillID   string              `json:"lastWillID,omitempty"`
 	Features     map[string]*Feature `json:"feature"`
 	transport    messaging.PublishSubscriber
 }
@@ -38,12 +37,24 @@ func (d *Device) HasFeature(feature string) bool {
 	return false
 }
 
+func (d *Device) GetTopic(feature string) string {
+	if ft, ok := d.Features[feature]; ok && ft.GetTopic != "" {
+		return ft.GetTopic
+	}
+	return d.Topic + "/" + feature + "/get"
+}
+func (d *Device) SetTopic(feature string) string {
+	if ft, ok := d.Features[feature]; ok && ft.SetTopic != "" {
+		return ft.SetTopic
+	}
+	return d.Topic + "/" + feature + "/set"
+}
+
 func (d *Device) Set(feature, value string) error {
 	if !d.HasFeature(feature) {
 		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
 	}
-	ft := d.Features[feature]
-	d.transport.Publish(ft.SetTopic,
+	d.transport.Publish(d.SetTopic(feature),
 		[]byte(value), 1, false)
 	return nil
 }
@@ -52,8 +63,7 @@ func (d *Device) Watch(feature string, callback func(msg messaging.Message)) err
 	if !d.HasFeature(feature) {
 		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
 	}
-	ft := d.Features[feature]
-	d.transport.Subscribe(ft.GetTopic,
+	d.transport.Subscribe(d.GetTopic(feature),
 		1, callback)
 	return nil
 }
@@ -62,8 +72,7 @@ func (d *Device) Update(feature, value string) error {
 	if !d.HasFeature(feature) {
 		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
 	}
-	ft := d.Features[feature]
-	d.transport.Publish(ft.GetTopic,
+	d.transport.Publish(d.GetTopic(feature),
 		[]byte(value), 1, true)
 	return nil
 }
@@ -72,8 +81,7 @@ func (d *Device) OnSet(feature string, callback func(msg messaging.Message)) err
 	if !d.HasFeature(feature) {
 		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
 	}
-	ft := d.Features[feature]
-	d.transport.Subscribe(ft.SetTopic,
+	d.transport.Subscribe(d.SetTopic(feature),
 		1, callback)
 	return nil
 }
