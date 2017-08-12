@@ -60,6 +60,7 @@ func main() {
 		OnConnectHandler:        handler.OnConnect,
 		OnConnectionLostHandler: handler.OnConnectionLost,
 		WillTopic:               "leave",
+		WillPayload:             "hemtjanst",
 		WillRetain:              false,
 		WillQoS:                 0,
 	}
