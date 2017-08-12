@@ -92,6 +92,9 @@ func (m *Manager) Remove(msg string) {
 	for _, d := range m.devices {
 		if d.LastWillID == msg {
 			log.Print("Found device match for LastWillUID, calling Remove")
+			go m.forHandler(func(handler DeviceHandler) {
+				handler.DeviceLeave(d)
+			})
 			delete(m.devices, d.Topic)
 		}
 	}

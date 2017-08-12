@@ -30,7 +30,7 @@ func (h *Homekit) DeviceUpdated(d *device.Device) {
 
 		oldAcc := val.accessory
 		newAcc := createAccessoryFromDevice(d)
-		util.SetReachability(newAcc, util.GetReachability(oldAcc))
+		util.SetReachability(newAcc, true)
 
 		if !newAcc.Equal(oldAcc) {
 			val.accessory = newAcc

@@ -51,7 +51,7 @@ func main() {
 
 	log.Print("Attempting to connect to MQTT broker")
 	handler := &messaging.Handler{
-		Ann: announce,
+		Ann:   announce,
 		Leave: leave,
 	}
 	conf := flagmqtt.ClientConfig{
@@ -104,9 +104,9 @@ loop:
 				// We expect topics we care about to contain at least 1 /
 				break
 			}
-			manager.Add(newReg)
+			go manager.Add(newReg)
 		case msg := <-leave:
-			manager.Remove(string(msg))
+			go manager.Remove(string(msg))
 		}
 	}
 
