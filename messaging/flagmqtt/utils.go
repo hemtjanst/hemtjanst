@@ -1,12 +1,27 @@
 package flagmqtt
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 func envOrFlagStr(flagVal, envName, defVal string) (ret string) {
 	ret = defVal
 
 	if val, ok := os.LookupEnv(envName); ok {
 		ret = val
+	}
+	if flagVal != defVal {
+		ret = flagVal
+	}
+	return
+}
+
+func envOrFlagInt(flagVal int, envName string, defVal int) (ret int) {
+	ret = defVal
+
+	if val, ok := os.LookupEnv(envName); ok {
+		ret, _ = strconv.Itoa(val)
 	}
 	if flagVal != defVal {
 		ret = flagVal

@@ -14,16 +14,11 @@ import (
 )
 
 type ClientConfig struct {
-	WillTopic            string
-	WillPayload          string
-	WillQoS              int
-	WillRetain           bool
-	ClientID             string
-	ConnectTimeout       time.Duration
-	KeepAlive            time.Duration
-	MaxReconnectInterval time.Duration
-	PingTimeout          time.Duration
-	WriteTimeout         time.Duration
+	WillTopic   string
+	WillPayload string
+	WillQoS     int
+	WillRetain  bool
+	ClientID    string
 }
 
 func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
@@ -36,16 +31,21 @@ func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 		useTls = true
 	}
 
-	caPath := envOrFlagStr(*mqttCAFlag, "MQTT_CA_PATH", "")
-	certPath := envOrFlagStr(*mqttCertFlag, "MQTT_CERT_PATH", "")
-	keyPath := envOrFlagStr(*mqttKeyFlag, "MQTT_KEY_PATH", "")
-	address := envOrFlagStr(*mqttAddressFlag, "MQTT_ADDRESS", "localhost:1883")
-	username := envOrFlagStr(*mqttUsernameFlag, "MQTT_USERNAME", "")
-	password := envOrFlagStr(*mqttPasswordFlag, "MQTT_PASSWORD", "")
+	caPath := envOrFlagStr(*MqttCAFlag, "MQTT_CA_PATH", "")
+	certPath := envOrFlagStr(*MqttCertFlag, "MQTT_CERT_PATH", "")
+	keyPath := envOrFlagStr(*MqttKeyFlag, "MQTT_KEY_PATH", "")
+	address := envOrFlagStr(*MqttAddressFlag, "MQTT_ADDRESS", "localhost:1883")
+	username := envOrFlagStr(*MqttUsernameFlag, "MQTT_USERNAME", "")
+	password := envOrFlagStr(*MqttPasswordFlag, "MQTT_PASSWORD", "")
+	connectionTimeout := envOrFlagInt(*MqttConnectionTimeout, "MQTT_CONNECTION_TIMEOUT", 10)
+	keepAlive := envOrFlagInt(*MqttKeepAlive, "MQTT_KEEPALIVE", 5)
+	maxReconnectInterval := envOrFlagInt(*MqttMaxReconnectInterval, "MQTT_MAX_RECONNECT_INTERVAL", 2)
+	pingTimeout := envOrFlagInt(*MqttPingTimeout, "MQTT_PING_TIMEOUT", 10)
+	writeTimeout := envOrFlagInt(*MqttWriteTimeout, "MQTT_WRITE_TIMEOUT", 5)
 
 	var tlsCfg *tls.Config
 	if useTls {
-		tlsCfg, err = setupTls(caPath, certPath, keyPath)
+		tlsCfg, err = setupTLS(caPath, certPath, keyPath)
 		if err != nil {
 			return
 		}
@@ -59,32 +59,16 @@ func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 		clientId = rndUuid.String()
 	}
 
-	if config.ConnectTimeout <= 0 {
-		config.ConnectTimeout = 30 * time.Second
-	}
-	if config.MaxReconnectInterval <= 0 {
-		config.MaxReconnectInterval = 1 * time.Minute
-	}
-	if config.KeepAlive <= 0 {
-		config.KeepAlive = 1 * time.Minute
-	}
-	if config.PingTimeout <= 0 {
-		config.PingTimeout = 30 * time.Second
-	}
-	if config.WriteTimeout <= 0 {
-		config.WriteTimeout = 30 * time.Second
-	}
-
-	opts := mq.NewClientOptions().
+	pts := mq.NewClientOptions().
 		AddBroker(fmt.Sprintf("tcp://%s", address)).
 		SetClientID(clientId).
-		SetConnectTimeout(config.ConnectTimeout).
-		SetKeepAlive(config.KeepAlive).
-		SetMaxReconnectInterval(config.MaxReconnectInterval).
+		SetConnectTimeout(time.Duration(connectionTimeout) * time.Second).
+		SetKeepAlive(time.Duration(keepAlive) * time.Second).
+		SetMaxReconnectInterval(time.Duration(maxReconnectInterval) * time.Minute).
 		SetMessageChannelDepth(100).
-		SetPingTimeout(config.PingTimeout).
+		SetPingTimeout(time.Duration(pingTimeout) * time.Second).
 		SetProtocolVersion(4).
-		SetWriteTimeout(config.WriteTimeout)
+		SetWriteTimeout(time.Duration(writeTimeout) * time.Second)
 
 	if config.WillTopic != "" {
 		opts.SetWill(
@@ -108,7 +92,7 @@ func NewPersistantMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 	return mq.NewClient(opts), nil
 }
 
-func setupTls(caPath, certPath, keyPath string) (*tls.Config, error) {
+func setupTLS(caPath, certPath, keyPath string) (*tls.Config, error) {
 	tlsCfg := &tls.Config{}
 	if caPath != "" {
 		caPem, err := ioutil.ReadFile(caPath)
