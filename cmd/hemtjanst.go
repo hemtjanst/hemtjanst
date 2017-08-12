@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"git.neotor.se/daenney/hemtjanst/device"
 	"git.neotor.se/daenney/hemtjanst/homekit"
+	"git.neotor.se/daenney/hemtjanst/homekit/bridge"
 	"git.neotor.se/daenney/hemtjanst/messaging"
+	"github.com/brutella/hc/accessory"
 	"github.com/satori/go.uuid"
 	flag "github.com/spf13/pflag"
 	"log"
@@ -43,6 +45,18 @@ func main() {
 	announce := make(chan []byte)
 	leave := make(chan []byte)
 
+	bridgeConfig := bridge.Config{
+		Pin:         "01020304",
+		Port:        "12345",
+		StoragePath: "./db",
+	}
+	bridgeInfo := accessory.Info{
+		Name:         "Hemtjänst",
+		SerialNumber: "12345",
+		Manufacturer: "BEDS Inc.",
+		Model:        "v0.1",
+	}
+
 	log.Print("Attempting to connect to MQTT broker")
 	c := messaging.NewMQTTClient(
 		announce, leave,
@@ -60,10 +74,20 @@ func main() {
 		}
 	}()
 
+	hkBridge, err := bridge.NewBridge(bridgeConfig, bridgeInfo)
+	if err != nil {
+		log.Fatal("Could not start HomeKit bridge: ", err)
+	}
+
 	manager := device.NewManager(messaging.NewMQTTMessenger(c))
 	log.Print("Started device manager")
+
+	hk := homekit.NewHomekit(hkBridge, manager)
+	manager.AddHandler(hk)
+
 	go func() {
-		homekit.New()
+		<-time.After(2 * time.Second)
+		hkBridge.Start()
 	}()
 	log.Print("Started HomeKit bridge")
 
@@ -99,6 +123,7 @@ loop:
 	}()
 
 	c.Disconnect(250)
+	hkBridge.Stop()
 	log.Print("Disconnected from broker. Bye!")
 	os.Exit(0)
 }
