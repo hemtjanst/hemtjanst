@@ -64,12 +64,18 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["bpf","internal/iana","internal/socket","ipv4","ipv6","proxy","websocket"]
+  packages = ["bpf","idna","internal/iana","internal/socket","ipv4","ipv6","proxy","websocket"]
   revision = "1c05540f6879653db88113bc4a2b70aec4bd491f"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/text"
+  packages = ["internal/gen","internal/triegen","internal/ucd","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
+  revision = "b19bf474d317b857955b12035d2c5acb57ce8b01"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2ea71e10f13e7cdc2e75659450f1b9f110b76361868ec1e9bd9307f9919e6ad4"
+  inputs-digest = "4770d7428f31c657c95a70d0fb6841fb1f688b50e135fce3b1a1c26da55f7fcf"
   solver-name = "gps-cdcl"
   solver-version = 1
