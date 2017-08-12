@@ -7,12 +7,15 @@ import (
 )
 
 type Device struct {
-	Topic      string
-	Name       string              `json:"name"`
-	Type       string              `json:"device"`
-	LastWillID uuid.UUID           `json:"lastWillID,omitempty"`
-	Features   map[string]*Feature `json:"feature"`
-	transport  messaging.PublishSubscriber
+	Topic        string
+	Name         string              `json:"name"`
+	Manufacturer string              `json:"manufacturer"`
+	Model        string              `json:"model"`
+	SerialNumber string              `json:"serialNumber"`
+	Type         string              `json:"device"`
+	LastWillID   uuid.UUID           `json:"lastWillID,omitempty"`
+	Features     map[string]*Feature `json:"feature"`
+	transport    messaging.PublishSubscriber
 }
 
 type Feature struct {
@@ -39,7 +42,7 @@ func (d *Device) Set(feature string, value string) error {
 		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
 	}
 	ft := d.Features[feature]
-	d.transport.Publish(fmt.Sprintf("%s/%s/%s", d.Topic, feature, ft.SetTopic),
+	d.transport.Publish(ft.SetTopic,
 		[]byte(value), 1, true)
 	return nil
 }
@@ -49,7 +52,7 @@ func (d *Device) Watch(feature string, callback func(msg messaging.Message)) err
 		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
 	}
 	ft := d.Features[feature]
-	d.transport.Subscribe(fmt.Sprintf("%s/%s/%s", d.Topic, feature, ft.GetTopic),
+	d.transport.Subscribe(ft.GetTopic,
 		1, callback)
 	return nil
 }
