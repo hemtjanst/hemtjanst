@@ -50,7 +50,10 @@ func main() {
 	}
 
 	log.Print("Attempting to connect to MQTT broker")
-	handler := &messaging.Handler{}
+	handler := &messaging.Handler{
+		Ann: announce,
+		Leave: leave,
+	}
 	conf := flagmqtt.ClientConfig{
 		ClientID:                "hemtjanst",
 		OnConnectHandler:        handler.OnConnect,

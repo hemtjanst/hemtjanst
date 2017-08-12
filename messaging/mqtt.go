@@ -12,8 +12,8 @@ type mqttMessenger struct {
 }
 
 type Handler struct {
-	ann   chan []byte
-	leave chan []byte
+	Ann   chan []byte
+	Leave chan []byte
 }
 
 // RetryWithBackoff will retry the operation for the amount of attempts. The
@@ -47,7 +47,7 @@ func (h *Handler) OnConnect(c mq.Client) {
 	log.Print("Attempting to subscribe to announce topic")
 	err := RetryWithBackoff(5, 2*time.Second, func() error {
 		token := c.Subscribe("announce", 1, func(client mq.Client, msg mq.Message) {
-			h.ann <- msg.Payload()
+			h.Ann <- msg.Payload()
 		})
 		token.Wait()
 		return token.Error()
@@ -60,7 +60,7 @@ func (h *Handler) OnConnect(c mq.Client) {
 	log.Print("Attempting to subscribe to leave topic")
 	err = RetryWithBackoff(5, 2*time.Second, func() error {
 		token := c.Subscribe("leave", 1, func(client mq.Client, msg mq.Message) {
-			h.leave <- msg.Payload()
+			h.Leave <- msg.Payload()
 		})
 		token.Wait()
 		return token.Error()
