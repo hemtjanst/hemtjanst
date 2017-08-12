@@ -92,7 +92,7 @@ func (h *handler) onConnect(c mq.Client) {
 	log.Print("Subscribed to announce topic")
 
 	log.Print("Attempting to subscribe to leave topic")
-	err := RetryWithBackoff(5, 2*time.Second, func() error {
+	err = RetryWithBackoff(5, 2*time.Second, func() error {
 		token := c.Subscribe("leave", 1, func(client mq.Client, msg mq.Message) {
 			h.leave <- msg.Payload()
 		})
