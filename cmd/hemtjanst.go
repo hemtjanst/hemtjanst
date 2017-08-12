@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"git.neotor.se/daenney/hemtjanst/device"
-	"git.neotor.se/daenney/hemtjanst/homekit"
-	"git.neotor.se/daenney/hemtjanst/homekit/bridge"
-	"git.neotor.se/daenney/hemtjanst/messaging"
 	"github.com/brutella/hc/accessory"
+	"github.com/hemtjanst/hemtjanst/device"
+	"github.com/hemtjanst/hemtjanst/homekit"
+	"github.com/hemtjanst/hemtjanst/homekit/bridge"
+	"github.com/hemtjanst/hemtjanst/messaging"
 	"github.com/satori/go.uuid"
 	flag "github.com/spf13/pflag"
 	"log"

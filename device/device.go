@@ -2,7 +2,7 @@ package device
 
 import (
 	"fmt"
-	"git.neotor.se/daenney/hemtjanst/messaging"
+	"github.com/hemtjanst/hemtjanst/messaging"
 	"github.com/satori/go.uuid"
 )
 

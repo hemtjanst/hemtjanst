@@ -1,8 +1,8 @@
 package bridge
 
 import (
-	"git.neotor.se/daenney/hemtjanst/homekit/util"
 	"github.com/brutella/hc/accessory"
+	"github.com/hemtjanst/hemtjanst/homekit/util"
 )
 
 // Bridge

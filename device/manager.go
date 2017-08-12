@@ -3,7 +3,7 @@ package device
 import (
 	"encoding/json"
 	"fmt"
-	"git.neotor.se/daenney/hemtjanst/messaging"
+	"github.com/hemtjanst/hemtjanst/messaging"
 	"log"
 	"sync"
 )

@@ -1,9 +1,9 @@
 package homekit
 
 import (
-	"git.neotor.se/daenney/hemtjanst/device"
-	"git.neotor.se/daenney/hemtjanst/homekit/bridge"
-	"git.neotor.se/daenney/hemtjanst/homekit/util"
+	"github.com/hemtjanst/hemtjanst/device"
+	"github.com/hemtjanst/hemtjanst/homekit/bridge"
+	"github.com/hemtjanst/hemtjanst/homekit/util"
 	"sync"
 )
 

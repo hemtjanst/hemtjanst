@@ -1,13 +1,13 @@
 package homekit
 
 import (
-	"git.neotor.se/daenney/hemtjanst/device"
-	"git.neotor.se/daenney/hemtjanst/homekit/util"
-	"git.neotor.se/daenney/hemtjanst/messaging"
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/service"
 	"github.com/gosexy/to"
+	"github.com/hemtjanst/hemtjanst/device"
+	"github.com/hemtjanst/hemtjanst/homekit/util"
+	"github.com/hemtjanst/hemtjanst/messaging"
 	"log"
 	"net"
 	"reflect"
