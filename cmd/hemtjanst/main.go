@@ -57,12 +57,13 @@ func main() {
 		Ann:   announce,
 		Leave: leave,
 	}
+	cID := flagmqtt.NewUniqueIdentifier()
 	conf := flagmqtt.ClientConfig{
-		ClientID:                "hemtjanst2",
+		ClientID:                fmt.Sprintf("hemtjanst-%s", cID),
 		OnConnectHandler:        handler.OnConnect,
 		OnConnectionLostHandler: handler.OnConnectionLost,
 		WillTopic:               "leave",
-		WillPayload:             "hemtjanst2",
+		WillPayload:             fmt.Sprintf("hemtjanst-%s", cID),
 		WillRetain:              false,
 		WillQoS:                 0,
 	}
