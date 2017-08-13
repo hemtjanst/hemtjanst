@@ -200,9 +200,9 @@ or closed (as part of a security system for example) can be defined like this:
 ```json
 {
   "name": "bathroom window",
-  "type": "contactSensor",
-  "feature":
-    "contactSensorState": {}
+  "type": "contactSensor",
+  "feature": {
+   "contactSensorState": {}
   },
   "lastWillID": "f56ad37c-aa0f-45f4-8e92-f9a6dba39d84"
 }
