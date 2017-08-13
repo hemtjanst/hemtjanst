@@ -169,9 +169,9 @@ this:
 ```json
 {
   "name": "kitchen stove light",
-  "device": "light",
+  "type": "light",
   "feature": {
-    "power": {}
+    "on": {}
   }
 }
 ```
@@ -182,13 +182,13 @@ too, so it's more likely you'll want to publish something like this:
 ```json
 {
   "name": "living room light",
-  "device": "light",
+  "type": "light",
   "feature": {
-    "power": {},
+    "on": {},
     "brightness": {},
     "colorTemperature": {
       "getTopic": "light/ground_floor/living_room/warmth/get",
-      "setTopic": "light/ground_floor/living_room/warmt/set",
+      "setTopic": "light/ground_floor/living_room/warmth/set",
     },
   }
 }
@@ -200,9 +200,9 @@ or closed (as part of a security system for example) can be defined like this:
 ```json
 {
   "name": "bathroom window",
-  "device": "contactSensor",
-  "feature": {
-    "contact": {}
+  "type": "contactSensor",
+  "feature":
+    "contactSensorState": {}
   },
   "lastWillID": "f56ad37c-aa0f-45f4-8e92-f9a6dba39d84"
 }
