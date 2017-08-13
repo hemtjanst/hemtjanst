@@ -8,11 +8,11 @@ import (
 )
 
 // Serve serves the webinterface
-func Serve(d *device.Manager) {
+func Serve(d *device.Manager, addr string) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", indexHandler(d))
 	h := &http.Server{
-		Addr:              ":8080",
+		Addr:              addr,
 		Handler:           mux,
 		ReadTimeout:       10 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,

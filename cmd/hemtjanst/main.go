@@ -19,10 +19,11 @@ import (
 )
 
 var (
-	addr  = flag.String("address", "127.0.0.1", "IP or hostname for Hemtjänst to bind on")
-	port  = flag.String("port", "12345", "Port for Hemtjänst to bind on")
-	pin   = flag.String("pin", "01020304", "Pairing pin for the HomeKit bridge")
-	wAddr = flag.String("web", ":8080", "IP/host:port to bind the webinterface to")
+	addr     = flag.String("address", "127.0.0.1", "IP or hostname for Hemtjänst to bind on")
+	port     = flag.String("port", "12345", "Port for Hemtjänst to bind on")
+	pin      = flag.String("pin", "01020304", "Pairing pin for the HomeKit bridge")
+	startWeb = flag.Bool("web.ui", false, "Start the built-in web UI")
+	wAddr    = flag.String("web.addr", ":8080", "IP/host:port to bind the webinterface to")
 )
 
 func main() {
@@ -96,11 +97,13 @@ func main() {
 	}()
 	log.Print("Started HomeKit bridge")
 
-	go func() {
-		<-time.After(5 * time.Second)
-		web.Serve(manager)
-	}()
-	log.Print("Started web interface")
+	if *startWeb {
+		go func() {
+			<-time.After(5 * time.Second)
+			web.Serve(manager, *wAddr)
+		}()
+		log.Print("Started web interface")
+	}
 
 loop:
 	for {
