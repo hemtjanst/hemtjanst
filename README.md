@@ -11,6 +11,26 @@ enough fashion that we can automatically generate HomeKit accessories from it.
 Though the aim for now is HomeKit the metadata published should be enough to
 also be able to create bridges for other platforms, like SmartThings.
 
+## Installation
+
+The binary is fully self-contained and can be installed by simply issuing a:
+
+```
+go install github.com/hemtjanst/hemtjanst/cmd/hemtjanst
+```
+
+## Usage
+
+Once you've `go install`ed the project a binary will be in your `$GOPATH/bin`.
+If you do not have explicitly set a `$GOPATH` environment variable it defaults
+to `$HOME/go`. Ensure to add `$GOPATH/bin` to your `$PATH` or use the full path
+to the binary.
+
+By default it will connect to an MQTT broker on `localhost:1883` and expose a
+HomeKit bridge on port `12345` with pairing pin-code `01020304`.
+
+Pass a `--help` for all available options.
+
 ## Specification
 
 ### Discovery

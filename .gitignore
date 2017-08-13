@@ -15,7 +15,3 @@
 
 # Go vendor directory
 vendor/
-
-# Binary
-hemtjanst
-cmd/hemtjanst
