@@ -1,0 +1,26 @@
+{{define "content"}}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>MQTT Topic</th>
+        <th>Type</th>
+        <th>Features</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $key, $value := . }}
+        <tr>
+          <td>{{$value.Name}}</td>
+          <td>{{$value.Topic}}</td>
+          <td>{{$value.Type}}</td>
+          <td>
+          {{ range $name, $feature := $value.Features }}
+            {{$name}}&nbsp;
+          {{end}}
+          <td>
+        </tr>
+      {{end}}
+    </tbody>
+  </table>
+{{end}}
