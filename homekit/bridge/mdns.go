@@ -2,10 +2,11 @@ package bridge
 
 import (
 	"github.com/brutella/hc/log"
-	"github.com/oleksandr/bonjour"
+	"github.com/grandcat/zeroconf"
 	"golang.org/x/net/idna"
 
 	"fmt"
+	"net"
 	"os"
 	"strings"
 )
@@ -13,7 +14,7 @@ import (
 // MDNSService represents a mDNS service.
 type MDNSService struct {
 	config *Config
-	server *bonjour.Server
+	server *zeroconf.Server
 }
 
 // NewMDNSService returns a new service based for the bridge name, id and port.
@@ -46,7 +47,7 @@ func (s *MDNSService) Publish() error {
 		stripped = puny
 	}
 
-	server, err := bonjour.RegisterProxy(stripped, "_hap._tcp.", "", s.config.servePort, host, s.config.IP, text, nil)
+	server, err := zeroconf.RegisterProxy(stripped, "_hap._tcp.", "", s.config.servePort, host, []string{s.config.IP}, text, []net.Interface{})
 	if err != nil {
 		log.Info.Panic(err)
 	}

@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/db"
@@ -72,7 +71,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 
 	database := db.NewDatabaseWithStorage(storage)
 
-	hap_pin, err := hc.NewPin(cfg.Pin)
+	hap_pin, err := NewPin(cfg.Pin)
 	if err != nil {
 		return nil, err
 	}

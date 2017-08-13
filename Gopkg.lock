@@ -10,8 +10,14 @@
 [[projects]]
   branch = "master"
   name = "github.com/brutella/hc"
-  packages = [".","accessory","characteristic","crypto","crypto/chacha20poly1305","crypto/curve25519","crypto/hkdf","db","event","hap","hap/controller","hap/data","hap/endpoint","hap/http","hap/pair","log","service","util"]
+  packages = ["accessory","characteristic","crypto","crypto/chacha20poly1305","crypto/curve25519","crypto/hkdf","db","event","hap","hap/controller","hap/data","hap/endpoint","hap/http","hap/pair","log","service","util"]
   revision = "5f75b70715efe858574e7d6719878ce060693db1"
+
+[[projects]]
+  name = "github.com/cenkalti/backoff"
+  packages = ["."]
+  revision = "32cd0c5b3aef12c76ed64aaf678f6c79736be7dc"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/eclipse/paho.mqtt.golang"
@@ -33,21 +39,16 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/oleksandr/bonjour"
+  name = "github.com/grandcat/zeroconf"
   packages = ["."]
-  revision = "5dcf00d8b228be86307f952f550f2191d956b9e2"
+  revision = "e4a16e81aad43bf839b50c68f08488c3e865f707"
+
 
 [[projects]]
   name = "github.com/satori/go.uuid"
   packages = ["."]
   revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
   version = "v1.1.0"
-
-[[projects]]
-  name = "github.com/spf13/pflag"
-  packages = ["."]
-  revision = "e57e3eeb33f795204c1ca35f56c44f83227c6e66"
-  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -76,6 +77,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4770d7428f31c657c95a70d0fb6841fb1f688b50e135fce3b1a1c26da55f7fcf"
+  inputs-digest = "601cdc32ce004dcb60e48b406bff7036133c84e9ecf5fa98fb37b53a7d1f695b"
   solver-name = "gps-cdcl"
   solver-version = 1
