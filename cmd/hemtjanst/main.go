@@ -45,6 +45,7 @@ func main() {
 	bridgeConfig := bridge.Config{
 		Pin:         *pin,
 		Port:        *port,
+		IP:          *addr,
 		StoragePath: *dbPath,
 	}
 	bridgeInfo := accessory.Info{
