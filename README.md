@@ -31,6 +31,17 @@ HomeKit bridge on port `12345` with pairing pin-code `01020304`.
 
 Pass a `--help` for all available options.
 
+## Web UI
+
+There's currently a very experimental web UI included. However, the templates
+aren't bundled when building the binary just yet so you'll need to put those
+in a `web/templates` directory relative to the path of the binary for it to
+work.
+
+Once the UI starts to do something useful aside from just listing devices and
+their features the templates will be embedded in the binary to avoid this
+problem entirely.
+
 ## Specification
 
 ### Discovery
