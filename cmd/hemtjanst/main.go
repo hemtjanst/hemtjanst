@@ -24,6 +24,7 @@ var (
 	pin      = flag.String("pin", "01020304", "Pairing pin for the HomeKit bridge")
 	startWeb = flag.Bool("web.ui", false, "Start the built-in web UI")
 	wAddr    = flag.String("web.addr", ":8080", "IP/host:port to bind the webinterface to")
+	dbPath   = flag.String("db.path", "./db", "Path to store the database with HomeKit key pairs etc.")
 )
 
 func main() {
@@ -44,7 +45,7 @@ func main() {
 	bridgeConfig := bridge.Config{
 		Pin:         *pin,
 		Port:        *port,
-		StoragePath: "./db",
+		StoragePath: *dbPath,
 	}
 	bridgeInfo := accessory.Info{
 		Name:         "Hemtjänst",
