@@ -4,6 +4,7 @@ import (
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/service"
+	ht_char "github.com/hemtjanst/hemtjanst/homekit/characteristic"
 	"strings"
 )
 
@@ -84,6 +85,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewCategory().Characteristic
 	case "chargingstate":
 		return characteristic.NewChargingState().Characteristic
+	case "colortemperature":
+		return ht_char.NewColorTemperature().Characteristic
 	case "configurebridgedaccessory":
 		return characteristic.NewConfigureBridgedAccessory().Characteristic
 	case "configurebridgedaccessorystatus":
