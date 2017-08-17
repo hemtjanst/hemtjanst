@@ -49,6 +49,7 @@ func (m *Manager) Add(topic string) {
 			if ft.GetTopic == "" {
 				ft.GetTopic = fmt.Sprintf("%s/%s/get", topic, name)
 			}
+			ft.devRef = dev
 		}
 
 		go m.forHandler(func(handler DeviceHandler) {

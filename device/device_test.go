@@ -10,4 +10,9 @@ func TestNewDevice(t *testing.T) {
 	if d.Topic != "test" {
 		t.Errorf("Expected topic of %s, got %s", "test", d.Topic)
 	}
+
+	if d.HasFeature("") {
+		t.Error("Expected false, got ", d.HasFeature(""))
+	}
+
 }
