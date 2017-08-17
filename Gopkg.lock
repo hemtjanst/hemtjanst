@@ -33,16 +33,15 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/miekg/dns"
-  packages = ["."]
-  revision = "bbca4873b326f5dc54bfe31148446d4ed79a5a02"
-
-[[projects]]
-  branch = "master"
   name = "github.com/grandcat/zeroconf"
   packages = ["."]
   revision = "e4a16e81aad43bf839b50c68f08488c3e865f707"
 
+[[projects]]
+  branch = "master"
+  name = "github.com/miekg/dns"
+  packages = ["."]
+  revision = "bbca4873b326f5dc54bfe31148446d4ed79a5a02"
 
 [[projects]]
   name = "github.com/satori/go.uuid"
