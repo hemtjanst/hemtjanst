@@ -2,7 +2,6 @@ package device
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/hemtjanst/hemtjanst/messaging"
 )
 
@@ -24,6 +23,7 @@ type Feature struct {
 	Step     int    `json:"step,omitempty"`
 	GetTopic string `json:"getTopic,omitempty"`
 	SetTopic string `json:"setTopic,omitempty"`
+	devRef   *Device
 }
 
 func NewDevice(topic string, client messaging.PublishSubscriber) *Device {
@@ -37,55 +37,6 @@ func (d *Device) HasFeature(feature string) bool {
 	return false
 }
 
-func (d *Device) GetTopic(feature string) string {
-	if ft, ok := d.Features[feature]; ok && ft.GetTopic != "" {
-		return ft.GetTopic
-	}
-	return d.Topic + "/" + feature + "/get"
-}
-func (d *Device) SetTopic(feature string) string {
-	if ft, ok := d.Features[feature]; ok && ft.SetTopic != "" {
-		return ft.SetTopic
-	}
-	return d.Topic + "/" + feature + "/set"
-}
-
-func (d *Device) Set(feature, value string) error {
-	if !d.HasFeature(feature) {
-		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
-	}
-	d.transport.Publish(d.SetTopic(feature),
-		[]byte(value), 1, false)
-	return nil
-}
-
-func (d *Device) Watch(feature string, callback func(msg messaging.Message)) error {
-	if !d.HasFeature(feature) {
-		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
-	}
-	d.transport.Subscribe(d.GetTopic(feature),
-		1, callback)
-	return nil
-}
-
-func (d *Device) Update(feature, value string) error {
-	if !d.HasFeature(feature) {
-		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
-	}
-	d.transport.Publish(d.GetTopic(feature),
-		[]byte(value), 1, true)
-	return nil
-}
-
-func (d *Device) OnSet(feature string, callback func(msg messaging.Message)) error {
-	if !d.HasFeature(feature) {
-		return fmt.Errorf("Feature %s not found on device %s", feature, d.Topic)
-	}
-	d.transport.Subscribe(d.SetTopic(feature),
-		1, callback)
-	return nil
-}
-
 func (d *Device) PublishMeta() error {
 	js, err := json.Marshal(d)
 	if err != nil {
@@ -93,4 +44,20 @@ func (d *Device) PublishMeta() error {
 	}
 	d.transport.Publish(d.Topic+"/meta", js, 1, true)
 	return nil
+}
+
+func (f *Feature) Set(value string) {
+	f.devRef.transport.Publish(f.SetTopic, []byte(value), 1, false)
+}
+
+func (f *Feature) Watch(callback func(msg messaging.Message)) {
+	f.devRef.transport.Subscribe(f.GetTopic, 1, callback)
+}
+
+func (f *Feature) Update(value string) {
+	f.devRef.transport.Publish(f.GetTopic, []byte(value), 1, true)
+}
+
+func (f *Feature) OnSet(callback func(msg messaging.Message)) {
+	f.devRef.transport.Subscribe(f.SetTopic, 1, callback)
 }

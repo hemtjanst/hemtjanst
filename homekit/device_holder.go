@@ -78,7 +78,6 @@ func createAccessoryFromDevice(d *device.Device) *accessory.Accessory {
 		}
 		svc.AddCharacteristic(ch)
 		chCount++
-		featureName := name
 
 		ch.OnValueUpdateFromConn(func(conn net.Conn, c *characteristic.Characteristic, newValue, oldValue interface{}) {
 			var out string
@@ -95,10 +94,10 @@ func createAccessoryFromDevice(d *device.Device) *accessory.Accessory {
 			}
 
 			if out != "" {
-				d.Set(featureName, out)
+				feature.Set(out)
 			}
 		})
-		d.Watch(name, func(msg messaging.Message) {
+		feature.Watch(func(msg messaging.Message) {
 			ch.UpdateValue(string(msg.Payload()))
 		})
 
