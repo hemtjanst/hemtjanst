@@ -50,14 +50,14 @@ func (f *Feature) Set(value string) {
 	f.devRef.transport.Publish(f.SetTopic, []byte(value), 1, false)
 }
 
-func (f *Feature) Watch(callback func(msg messaging.Message)) {
-	f.devRef.transport.Subscribe(f.GetTopic, 1, callback)
+func (f *Feature) OnSet(callback func(msg messaging.Message)) {
+	f.devRef.transport.Subscribe(f.SetTopic, 1, callback)
 }
 
 func (f *Feature) Update(value string) {
 	f.devRef.transport.Publish(f.GetTopic, []byte(value), 1, true)
 }
 
-func (f *Feature) OnSet(callback func(msg messaging.Message)) {
-	f.devRef.transport.Subscribe(f.SetTopic, 1, callback)
+func (f *Feature) OnUpdate(callback func(msg messaging.Message)) {
+	f.devRef.transport.Subscribe(f.GetTopic, 1, callback)
 }
