@@ -97,7 +97,7 @@ func createAccessoryFromDevice(d *device.Device) *accessory.Accessory {
 				feature.Set(out)
 			}
 		})
-		feature.Watch(func(msg messaging.Message) {
+		feature.OnUpdate(func(msg messaging.Message) {
 			ch.UpdateValue(string(msg.Payload()))
 		})
 
