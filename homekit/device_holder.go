@@ -105,6 +105,14 @@ func createAccessoryFromDevice(d *device.Device) *accessory.Accessory {
 
 	if chCount > 0 {
 		a.AddService(svc)
+		for _, s := range a.GetServices() {
+			// There should never be multiple instances with the same type added to a device
+			// so it should be safe to set ID of service/characteristics to its type
+			s.ID = util.HexToInt64(s.Type, s.ID)
+			for _, c := range s.GetCharacteristics() {
+				c.ID = util.HexToInt64(c.Type, c.ID)
+			}
+		}
 	}
 	return a
 }
