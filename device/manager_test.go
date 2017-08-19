@@ -33,13 +33,13 @@ func TestManagerAdd(t *testing.T) {
 	m := messaging.NewTestingMessenger(c)
 	mn := NewManager(m)
 
-	mn.Add("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	if len(mn.devices) != 1 {
 		t.Error("Expected only 1 device, have ", len(mn.devices))
 	}
 
 	// Add the same device again, nothing should happen
-	mn.Add("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	if len(mn.devices) != 1 {
 		t.Error("Expected only 1 device, have ", len(mn.devices))
 	}
@@ -50,7 +50,7 @@ func TestManagerGet(t *testing.T) {
 	m := messaging.NewTestingMessenger(c)
 	mn := NewManager(m)
 
-	mn.Add("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	_, err := mn.Get("lightbulb/kitchen")
 	if err != nil {
 		t.Error("Expected to find device")
@@ -71,8 +71,8 @@ func TestManagerGetAll(t *testing.T) {
 		t.Error("Expected 0 devices, got ", len(devs))
 	}
 
-	mn.Add("lightbulb/kitchen")
-	mn.Add("contactSensor/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
+	mn.Add("contactSensor/kitchen", []byte(`{}`))
 
 	devs = mn.GetAll()
 	if len(devs) != 2 {
@@ -85,20 +85,20 @@ func TestManagerRemove(t *testing.T) {
 	m := messaging.NewTestingMessenger(c)
 	mn := NewManager(m)
 
-	mn.Add("lightbulb/kitchen")
-	mn.Add("contactSensor/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
+	mn.Add("contactSensor/kitchen", []byte(`{}`))
 
-	mn.Remove("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(""))
 	if len(mn.devices) != 1 {
 		t.Error("Expected 1 device, got ", len(mn.devices))
 	}
 
-	mn.Add("contactSensor/bathroom")
+	/*mn.Add("contactSensor/bathroom", []byte(`{}`))
 	mn.devices["contactSensor/bathroom"].LastWillID = "ted"
 	mn.Remove("ted")
 	if len(mn.devices) != 1 {
 		t.Error("Expected 1 device, got ", len(mn.devices))
-	}
+	}*/
 }
 
 func TestManagerAddHandler(t *testing.T) {
@@ -106,7 +106,7 @@ func TestManagerAddHandler(t *testing.T) {
 	m := messaging.NewTestingMessenger(c)
 	mn := NewManager(m)
 
-	mn.Add("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	h := &TestingDeviceHandler{}
 	mn.AddHandler(h)
 

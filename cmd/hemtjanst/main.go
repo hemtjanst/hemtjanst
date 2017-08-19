@@ -28,6 +28,12 @@ var (
 	dbPath   = flag.String("db.path", "./db", "Path to store the database with HomeKit key pairs etc.")
 )
 
+const (
+	announceTopicPrefix = "announce/"
+	leaveTopic          = "leave"
+	discoverTopic       = "discover"
+)
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n\n", os.Args[0])
@@ -40,8 +46,8 @@ func main() {
 	log.Print("Initialing Hemtjänst")
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	announce := make(chan []byte)
-	leave := make(chan []byte)
+	announce := make(chan messaging.Message)
+	leave := make(chan messaging.Message)
 
 	bridgeConfig := bridge.Config{
 		Pin:         *pin,
@@ -58,8 +64,11 @@ func main() {
 
 	log.Print("Attempting to connect to MQTT broker")
 	handler := &messaging.Handler{
-		Ann:   announce,
-		Leave: leave,
+		Ann:           announce,
+		Leave:         leave,
+		AnnounceTopic: announceTopicPrefix + "#",
+		LeaveTopic:    leaveTopic,
+		DiscoverTopic: discoverTopic,
 	}
 	cID := flagmqtt.NewUniqueIdentifier()
 	conf := flagmqtt.ClientConfig{
@@ -115,15 +124,22 @@ loop:
 			log.Printf("Received signal: %s, proceeding to shutdown", sig)
 			break loop
 		case msg := <-announce:
-			newReg := string(msg)
+			newReg := msg.Topic()
 			log.Print("New announcement: ", newReg)
+			if len(newReg) <= len(announceTopicPrefix) || newReg[0:len(announceTopicPrefix)] != announceTopicPrefix {
+				// Announcement doesn't start with prefix
+				log.Printf("Ignoring: Announcement doesn't start with " + announceTopicPrefix)
+				continue
+			}
+			newReg = newReg[len(announceTopicPrefix):]
 			if !strings.Contains(newReg, "/") {
 				// We expect topics we care about to contain at least 1 /
-				break
+				log.Printf("Ignoring: Malformed topic %s", newReg)
+				continue
 			}
-			go manager.Add(newReg)
+			go manager.Add(newReg, msg.Payload())
 		case msg := <-leave:
-			go manager.Remove(string(msg))
+			go manager.Remove(string(msg.Payload()))
 		}
 	}
 

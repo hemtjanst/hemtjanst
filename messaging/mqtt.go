@@ -12,8 +12,11 @@ type mqttMessenger struct {
 }
 
 type Handler struct {
-	Ann   chan []byte
-	Leave chan []byte
+	Ann           chan Message
+	Leave         chan Message
+	AnnounceTopic string
+	LeaveTopic    string
+	DiscoverTopic string
 }
 
 // RetryWithBackoff will retry the operation for the amount of attempts. The
@@ -44,42 +47,48 @@ func RetryWithBackoff(attempts int, backoff time.Duration, callback func() error
 func (h *Handler) OnConnect(c mq.Client) {
 	log.Print("Connected to MQTT broker")
 
-	log.Print("Attempting to subscribe to announce topic")
-	err := RetryWithBackoff(5, 2*time.Second, func() error {
-		token := c.Subscribe("announce", 1, func(client mq.Client, msg mq.Message) {
-			h.Ann <- msg.Payload()
+	if h.Ann != nil && h.AnnounceTopic != "" {
+		log.Print("Attempting to subscribe to announce topic")
+		err := RetryWithBackoff(5, 2*time.Second, func() error {
+			token := c.Subscribe(h.AnnounceTopic, 1, func(client mq.Client, msg mq.Message) {
+				h.Ann <- msg
+			})
+			token.Wait()
+			return token.Error()
 		})
-		token.Wait()
-		return token.Error()
-	})
-	if err != nil {
-		log.Fatal("Could not subscribe to announce topic")
+		if err != nil {
+			log.Fatal("Could not subscribe to announce topic")
+		}
+		log.Print("Subscribed to announce topic")
 	}
-	log.Print("Subscribed to announce topic")
 
-	log.Print("Attempting to subscribe to leave topic")
-	err = RetryWithBackoff(5, 2*time.Second, func() error {
-		token := c.Subscribe("leave", 1, func(client mq.Client, msg mq.Message) {
-			h.Leave <- msg.Payload()
+	if h.Leave != nil && h.LeaveTopic != "" {
+		log.Print("Attempting to subscribe to leave topic")
+		err := RetryWithBackoff(5, 2*time.Second, func() error {
+			token := c.Subscribe(h.LeaveTopic, 1, func(client mq.Client, msg mq.Message) {
+				h.Leave <- msg
+			})
+			token.Wait()
+			return token.Error()
 		})
-		token.Wait()
-		return token.Error()
-	})
-	if err != nil {
-		log.Fatal("Could not subscribe to leave topic")
+		if err != nil {
+			log.Fatal("Could not subscribe to leave topic")
+		}
+		log.Print("Subscribed to leave topic")
 	}
-	log.Print("Subscribed to leave topic")
 
-	log.Print("Attempting to publish to discover topic")
-	err = RetryWithBackoff(5, 2*time.Second, func() error {
-		token := c.Publish("discover", 1, true, "1")
-		token.Wait()
-		return token.Error()
-	})
-	if err != nil {
-		log.Fatal("Could not publish to discover topic")
+	if h.DiscoverTopic != "" {
+		log.Print("Attempting to publish to discover topic")
+		err := RetryWithBackoff(5, 2*time.Second, func() error {
+			token := c.Publish(h.DiscoverTopic, 1, true, "1")
+			token.Wait()
+			return token.Error()
+		})
+		if err != nil {
+			log.Fatal("Could not publish to discover topic")
+		}
+		log.Print("Initiated discovery")
 	}
-	log.Print("Initiated discovery")
 }
 
 // onConnectionLost gets triggered whenver we unexpectedly lose connection with
