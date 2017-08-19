@@ -19,6 +19,7 @@ import (
 )
 
 var (
+	name     = flag.String("name", "hemtjanst", "Name of bridge instance")
 	addr     = flag.String("address", "127.0.0.1", "IP or hostname for Hemtjänst to bind on")
 	port     = flag.String("port", "12345", "Port for Hemtjänst to bind on")
 	pin      = flag.String("pin", "01020304", "Pairing pin for the HomeKit bridge")
@@ -49,7 +50,7 @@ func main() {
 		StoragePath: *dbPath,
 	}
 	bridgeInfo := accessory.Info{
-		Name:         "Hemtjänst",
+		Name:         *name,
 		SerialNumber: "12345",
 		Manufacturer: "BEDS Inc.",
 		Model:        "v0.1",
