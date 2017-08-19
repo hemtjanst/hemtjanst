@@ -1,7 +1,9 @@
 package device
 
 import (
+	"bytes"
 	"github.com/hemtjanst/hemtjanst/messaging"
+	"reflect"
 	"testing"
 )
 
@@ -14,5 +16,30 @@ func TestNewDevice(t *testing.T) {
 	if d.HasFeature("") {
 		t.Error("Expected false, got ", d.HasFeature(""))
 	}
+}
 
+func TestPublishMeta(t *testing.T) {
+	m := &messaging.TestingMessenger{}
+	d := NewDevice("lightbulb/kitchen", m)
+	err := d.PublishMeta()
+	if err != nil {
+		t.Error("Expected to successfully publish meta, got ", err)
+	}
+
+	if m.Action != "publish" {
+		t.Error("Expected to publish, but tried to ", m.Action)
+	}
+	if !reflect.DeepEqual(m.Topic, []string{"lightbulb/kitchen/meta"}) {
+		t.Error("Expected topic to be lightbulb/kitchen/meta, got ", m.Topic)
+	}
+	if m.Qos != 1 {
+		t.Error("Expected QoS of 1, got ", m.Qos)
+	}
+	if !m.Persist {
+		t.Error("Expected persist, got ", m.Persist)
+	}
+	msg := `{"Topic":"lightbulb/kitchen","name":"","manufacturer":"","model":"","serialNumber":"","type":"","feature":null}`
+	if !bytes.Equal(m.Message, []byte(msg)) {
+		t.Errorf("Expected %s, got %s", msg, string(m.Message))
+	}
 }

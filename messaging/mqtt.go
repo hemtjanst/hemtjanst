@@ -125,8 +125,29 @@ func (m *mqttMessenger) Unsubscribe(topics ...string) {
 }
 
 // TestingMessenger is a no-op messenger useful for when running tests
-type TestingMessenger struct{}
+type TestingMessenger struct {
+	Action   string
+	Topic    []string
+	Message  []byte
+	Qos      int
+	Persist  bool
+	Callback func(Message)
+}
 
-func (*TestingMessenger) Publish(destination string, message []byte, qos int, persist bool) {}
-func (*TestingMessenger) Subscribe(dsource string, qos int, callback func(Message))         {}
-func (*TestingMessenger) Unsubscribe(sources ...string)                                     {}
+func (tm *TestingMessenger) Publish(topic string, message []byte, qos int, persist bool) {
+	tm.Action = "publish"
+	tm.Topic = []string{topic}
+	tm.Message = message
+	tm.Qos = qos
+	tm.Persist = persist
+}
+func (tm *TestingMessenger) Subscribe(topic string, qos int, callback func(Message)) {
+	tm.Action = "subscribe"
+	tm.Topic = []string{topic}
+	tm.Qos = qos
+	tm.Callback = callback
+}
+func (tm *TestingMessenger) Unsubscribe(topics ...string) {
+	tm.Action = "unsubscribe"
+	tm.Topic = topics
+}
