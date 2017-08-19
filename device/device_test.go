@@ -43,3 +43,101 @@ func TestPublishMeta(t *testing.T) {
 		t.Errorf("Expected %s, got %s", msg, string(m.Message))
 	}
 }
+
+func TestFeatureSet(t *testing.T) {
+	m := &messaging.TestingMessenger{}
+	d := NewDevice("lightbulb", m)
+	f := &Feature{GetTopic: "lightbulb/on/get", SetTopic: "lightbulb/on/set", devRef: d}
+	d.Features = map[string]*Feature{}
+	d.Features["on"] = f
+	f.Set("1")
+
+	if m.Action != "publish" {
+		t.Error("Expected to publish, but instead tried to ", m.Action)
+	}
+	if !reflect.DeepEqual(m.Topic, []string{"lightbulb/on/set"}) {
+		t.Error("Expected topic to be lightbulb/on/set, got ", m.Topic)
+	}
+	if m.Qos != 1 {
+		t.Error("Expected QoS of 1, got ", m.Qos)
+	}
+	if m.Persist {
+		t.Error("Expected message without persist, got ", m.Persist)
+	}
+	if !bytes.Equal(m.Message, []byte("1")) {
+		t.Error("Expected message of 1, got ", string(m.Message))
+	}
+}
+
+func TestFeatureOnSet(t *testing.T) {
+	m := &messaging.TestingMessenger{}
+	d := NewDevice("lightbulb", m)
+	f := &Feature{GetTopic: "lightbulb/on/get", SetTopic: "lightbulb/on/set", devRef: d}
+	d.Features = map[string]*Feature{}
+	d.Features["on"] = f
+
+	f.OnSet(func(messaging.Message) {
+		return
+	})
+	if m.Action != "subscribe" {
+		t.Error("Expected to subscribe, but instead tried to ", m.Action)
+	}
+	if !reflect.DeepEqual(m.Topic, []string{"lightbulb/on/set"}) {
+		t.Error("Expected topic to be lightbulb/on/set, got ", m.Topic)
+	}
+	if m.Qos != 1 {
+		t.Error("Expected QoS of 1, got ", m.Qos)
+	}
+	if m.Callback == nil {
+		t.Error("Expected a callback, got nil")
+	}
+}
+
+func TestFeatureUpdate(t *testing.T) {
+	m := &messaging.TestingMessenger{}
+	d := NewDevice("lightbulb", m)
+	f := &Feature{GetTopic: "lightbulb/on/get", SetTopic: "lightbulb/on/set", devRef: d}
+	d.Features = map[string]*Feature{}
+	d.Features["on"] = f
+	f.Update("1")
+
+	if m.Action != "publish" {
+		t.Error("Expected to publish, but instead tried to ", m.Action)
+	}
+	if !reflect.DeepEqual(m.Topic, []string{"lightbulb/on/get"}) {
+		t.Error("Expected topic to be lightbulb/on/get, got ", m.Topic)
+	}
+	if m.Qos != 1 {
+		t.Error("Expected QoS of 1, got ", m.Qos)
+	}
+	if !m.Persist {
+		t.Error("Expected message to persist, got ", m.Persist)
+	}
+	if !bytes.Equal(m.Message, []byte("1")) {
+		t.Error("Expected message of 1, got ", string(m.Message))
+	}
+}
+
+func TestFeatureOnUpdate(t *testing.T) {
+	m := &messaging.TestingMessenger{}
+	d := NewDevice("lightbulb", m)
+	f := &Feature{GetTopic: "lightbulb/on/get", SetTopic: "lightbulb/on/set", devRef: d}
+	d.Features = map[string]*Feature{}
+	d.Features["on"] = f
+
+	f.OnUpdate(func(messaging.Message) {
+		return
+	})
+	if m.Action != "subscribe" {
+		t.Error("Expected to subscribe, but instead tried to ", m.Action)
+	}
+	if !reflect.DeepEqual(m.Topic, []string{"lightbulb/on/get"}) {
+		t.Error("Expected topic to be lightbulb/on/get, got ", m.Topic)
+	}
+	if m.Qos != 1 {
+		t.Error("Expected QoS of 1, got ", m.Qos)
+	}
+	if m.Callback == nil {
+		t.Error("Expected a callback, got nil")
+	}
+}
