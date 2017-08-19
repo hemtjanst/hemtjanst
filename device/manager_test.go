@@ -93,12 +93,13 @@ func TestManagerRemove(t *testing.T) {
 		t.Error("Expected 1 device, got ", len(mn.devices))
 	}
 
-	/*mn.Add("contactSensor/bathroom", []byte(`{}`))
+	mn.Add("contactSensor/bathroom", []byte(`{}`))
 	mn.devices["contactSensor/bathroom"].LastWillID = "ted"
-	mn.Remove("ted")
-	if len(mn.devices) != 1 {
-		t.Error("Expected 1 device, got ", len(mn.devices))
-	}*/
+	mn.Leave("ted")
+
+	if mn.devices["contactSensor/bathroom"].Reachable {
+		t.Error("Expected contactSensor/bathroom to be unreachable")
+	}
 }
 
 func TestManagerAddHandler(t *testing.T) {

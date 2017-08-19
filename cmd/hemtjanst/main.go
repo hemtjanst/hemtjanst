@@ -139,7 +139,7 @@ loop:
 			}
 			go manager.Add(newReg, msg.Payload())
 		case msg := <-leave:
-			go manager.Remove(string(msg.Payload()))
+			go manager.Leave(string(msg.Payload()))
 		}
 	}
 

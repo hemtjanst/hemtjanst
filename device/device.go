@@ -14,6 +14,7 @@ type Device struct {
 	Type         string              `json:"type"`
 	LastWillID   string              `json:"lastWillID,omitempty"`
 	Features     map[string]*Feature `json:"feature"`
+	Reachable    bool                `json:"-"`
 	transport    messaging.PublishSubscriber
 }
 

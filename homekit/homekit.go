@@ -22,7 +22,7 @@ func NewHomekit(bridge bridge.Bridge, manager *device.Manager) *Homekit {
 	}
 }
 
-func (h *Homekit) DeviceUpdated(d *device.Device) {
+func (h *Homekit) Updated(d *device.Device) {
 	h.lock.Lock()
 	defer h.lock.Unlock()
 	if val, ok := h.devices[d.Topic]; ok {
@@ -30,7 +30,7 @@ func (h *Homekit) DeviceUpdated(d *device.Device) {
 
 		oldAcc := val.accessory
 		newAcc := createAccessoryFromDevice(d)
-		util.SetReachability(newAcc, true)
+		util.SetReachability(newAcc, d.Reachable)
 
 		if !newAcc.Equal(oldAcc) {
 			val.accessory = newAcc
@@ -43,24 +43,14 @@ func (h *Homekit) DeviceUpdated(d *device.Device) {
 			return
 		}
 		if newDev.accessory != nil {
-			util.SetReachability(newDev.accessory, true)
+			util.SetReachability(newDev.accessory, d.Reachable)
 			h.bridge.AddAccessory(newDev.accessory)
 		}
 		h.devices[d.Topic] = newDev
 	}
 }
 
-func (h *Homekit) DeviceLeave(d *device.Device) {
-	if val, ok := h.devices[d.Topic]; ok {
-		h.lock.Lock()
-		defer h.lock.Unlock()
-		if val.accessory != nil {
-			util.SetReachability(val.accessory, false)
-		}
-	}
-}
-
-func (h *Homekit) DeviceRemoved(d *device.Device) {
+func (h *Homekit) Removed(d *device.Device) {
 	if val, ok := h.devices[d.Topic]; ok {
 		h.lock.Lock()
 		defer h.lock.Unlock()

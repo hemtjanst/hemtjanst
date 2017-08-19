@@ -8,15 +8,14 @@ import (
 	"sync"
 )
 
-type DeviceHandler interface {
-	DeviceUpdated(*Device)
-	DeviceLeave(*Device)
-	DeviceRemoved(*Device)
+type Handler interface {
+	Updated(*Device)
+	Removed(*Device)
 }
 
 type Manager struct {
 	devices  map[string]*Device
-	handlers []DeviceHandler
+	handlers []Handler
 	client   messaging.PublishSubscriber
 	sync.RWMutex
 }
@@ -25,7 +24,7 @@ func NewManager(c messaging.PublishSubscriber) *Manager {
 	return &Manager{
 		client:   c,
 		devices:  make(map[string]*Device, 10),
-		handlers: []DeviceHandler{},
+		handlers: []Handler{},
 	}
 }
 
@@ -44,8 +43,8 @@ func (m *Manager) Add(topic string, meta []byte) {
 			// Got empty payload, remove device
 			m.Lock()
 			defer m.Unlock()
-			m.forHandler(func(handler DeviceHandler) {
-				handler.DeviceRemoved(dev)
+			m.forHandler(func(handler Handler) {
+				handler.Removed(dev)
 			})
 
 			// Loop through all topics and add to slice first
@@ -71,6 +70,7 @@ func (m *Manager) Add(topic string, meta []byte) {
 	log.Print("Processing meta for device ", topic)
 
 	err := json.Unmarshal(meta, dev)
+	dev.Reachable = true
 	if err != nil {
 		log.Print(err)
 		return
@@ -85,8 +85,8 @@ func (m *Manager) Add(topic string, meta []byte) {
 		ft.devRef = dev
 	}
 
-	go m.forHandler(func(handler DeviceHandler) {
-		handler.DeviceUpdated(dev)
+	go m.forHandler(func(handler Handler) {
+		handler.Updated(dev)
 	})
 
 	if !existing {
@@ -112,33 +112,35 @@ func (m *Manager) GetAll() map[string]*Device {
 	return m.devices
 }
 
-func (m *Manager) Remove(msg string) {
+func (m *Manager) Leave(msg string) {
 	log.Print("Attempting to remove device ", msg)
 	m.Lock()
 	defer m.Unlock()
 	for _, d := range m.devices {
 		if d.LastWillID == msg || d.Topic == msg {
+			log.Printf("Found: %s, setting unreachable", d.Topic)
+			d.Reachable = false
 			dev := d
-			go m.forHandler(func(handler DeviceHandler) {
-				handler.DeviceLeave(dev)
+			go m.forHandler(func(handler Handler) {
+				handler.Updated(dev)
 			})
 		}
 	}
 }
 
-func (m *Manager) forHandler(f func(handler DeviceHandler)) {
+func (m *Manager) forHandler(f func(handler Handler)) {
 	for _, h := range m.handlers {
 		f(h)
 	}
 }
 
-func (m *Manager) AddHandler(handler DeviceHandler) {
+func (m *Manager) AddHandler(handler Handler) {
 	m.Lock()
 	defer m.Unlock()
 	m.handlers = append(m.handlers, handler)
 	go func() {
 		for _, device := range m.devices {
-			handler.DeviceUpdated(device)
+			handler.Updated(device)
 		}
 	}()
 }
@@ -147,6 +149,5 @@ func (m *Manager) AddHandler(handler DeviceHandler) {
 // be used in tests.
 type TestingDeviceHandler struct{}
 
-func (t *TestingDeviceHandler) DeviceUpdated(*Device) {}
-func (t *TestingDeviceHandler) DeviceLeave(*Device)   {}
-func (t *TestingDeviceHandler) DeviceRemoved(*Device) {}
+func (t *TestingDeviceHandler) Updated(*Device) {}
+func (t *TestingDeviceHandler) Removed(*Device) {}
