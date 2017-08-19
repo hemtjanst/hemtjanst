@@ -56,15 +56,6 @@ func (m *Manager) Add(topic string, meta []byte) {
 		log.Print(err)
 		return
 	}
-	for name, ft := range dev.Features {
-		if ft.SetTopic == "" {
-			ft.SetTopic = fmt.Sprintf("%s/%s/set", topic, name)
-		}
-		if ft.GetTopic == "" {
-			ft.GetTopic = fmt.Sprintf("%s/%s/get", topic, name)
-		}
-		ft.devRef = dev
-	}
 
 	go m.forHandler(func(handler Handler) {
 		handler.Updated(dev)

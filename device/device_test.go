@@ -52,6 +52,87 @@ func TestPublishMeta(t *testing.T) {
 	}
 }
 
+func TestDeviceUnMarshalJSON(t *testing.T) {
+	j := []byte(`
+	{
+		"topic": "light/jsonBulb",
+		"name": "jsonBulb",
+		"type": "lightbulb",
+		"feature": {
+			"on": {},
+			"brightness": {
+				"min": 0,
+				"max": 10,
+				"step": 1
+			},
+			"colorTemperature": {
+				"getTopic": "light/jsonBulb/color/get",
+				"setTopic": "light/jsonBulb/color/set"
+			}
+		}
+	}
+	`)
+	m := &messaging.TestingMessenger{}
+	d := NewDevice("light/jsonBulb", m)
+	err := d.UnmarshalJSON(j)
+	if err != nil {
+		t.Error(err)
+	}
+	var results = []struct {
+		attr string
+		exp  string
+		got  string
+	}{
+		{"topic", "light/jsonBulb", d.Topic},
+		{"name", "jsonBulb", d.Name},
+		{"type", "lightbulb", d.Type},
+		{"type", "lightbulb", d.Type},
+	}
+	for _, r := range results {
+		if r.exp != r.got {
+			t.Errorf("Expected attribute %s to be %s, got %s", r.attr, r.exp, r.got)
+		}
+	}
+
+	for name, ft := range []string{"on", "brightness", "colorTemperature"} {
+		_, err := d.GetFeature(ft)
+		if err != nil {
+			t.Error("Expected device to have feature ", name)
+		}
+	}
+
+	ft, _ := d.GetFeature("on")
+	if ft.GetTopic != "light/jsonBulb/on/get" {
+		t.Error("Expected GetTopic to be set to light/jsonBulb/on/get, got ", ft.GetTopic)
+	}
+	if ft.SetTopic != "light/jsonBulb/on/set" {
+		t.Error("Expected SetTopic to be set to light/jsonBulb/on/set, got ", ft.SetTopic)
+	}
+
+	ft, _ = d.GetFeature("brightness")
+	var results2 = []struct {
+		attr string
+		exp  int
+		got  int
+	}{
+		{"min", 0, ft.Min},
+		{"max", 10, ft.Max},
+		{"step", 1, ft.Step},
+	}
+	for _, r := range results2 {
+		if r.exp != r.got {
+			t.Errorf("Expected %s to be %d, got %d", r.attr, r.exp, r.got)
+		}
+	}
+	ft, _ = d.GetFeature("colorTemperature")
+	if ft.GetTopic != "light/jsonBulb/color/get" {
+		t.Error("Expected GetTopic to be set to light/jsonBulb/color/get, got ", ft.GetTopic)
+	}
+	if ft.SetTopic != "light/jsonBulb/color/set" {
+		t.Error("Expected SetTopic to be set to light/jsonBulb/color/set, got ", ft.SetTopic)
+	}
+}
+
 func TestFeatureSet(t *testing.T) {
 	m := &messaging.TestingMessenger{}
 	d := NewDevice("lightbulb", m)
