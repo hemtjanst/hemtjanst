@@ -55,16 +55,15 @@ receive the discovery request and must now announce themselves to the rest
 of the network. If someone then wants to initiate a full discovery all they
 need to do is publish again to discover (with the retain bit set).
 
-An announce is done by publishing to the `announce` topic. The body of the
-message must be the "root" topic of entity that joined, for example
-`light/ground_floor/kitchen/stove`, for the kitchen light near the stove.
+An announce is done by publishing to the `announce/YOUR NAME` topic with persistence.
+The body of the message must be the meta content for the entity that joined.
 The topic layout is entirely arbitrary and so is the naming of the device.
-Anyone interested in knowing about devices now simply subscribes to `announce`
+Anyone interested in knowing about devices now simply subscribes to `announce/#`
 and gets to know any device that joins.
 
-**Please note**, the name of the device (the last bit of the "root" topic) is
-used to generate a unique identifier for this device, so if you change it it'll
-be like you removed the existing device and added a new one.
+**Please note**, the topic of the device is used to generate a unique identifier for
+this device, so if you change it it'll be like you removed the existing device and
+added a new one.
 
 Whenever a device leaves it publishes its "root" topic to the `leave` topic.
 Similarly to announce this allows other clients to cancel their subscriptions
@@ -92,23 +91,21 @@ longer announcing this accessory to HomeKit.
 
 ## Metadata
 
-In order to know what type of device we're dealing with every device is
-expected to have a `meta` topic underneath its "root" topic. This topic can be
-written to by any existing bridge or by any entity watching `announce` that
-knows how to map this device to the metadata specification.
+When a device receives a discover it must publish it's meta underneath
+`announce/YOUR NAME` as detailed in the discovery protocol.
 
-This `meta` topic is a JSON object serialised as a string that contains any
+Meta is a JSON object serialised as a string that contains any
 additional information needed for Hemtjänst to do its thing and generate
 HomeKit accessories.
 
-As it currently stands the `meta` topic types and features follow the exact
+As it currently stands the types and features in meta follow the exact
 names in the HomeKit specification. To support another platform like
 SmartThings a similar mapping would need to be created.
 
 The `meta` document contains a number of required and optional entries. The
-required ones are: `name`, `type`, `feature`. The rest is optional.
+required ones are: `name`, type`, `feature`. The rest is optional.
 
-Optional keys are: `lastWillID`.
+Optional keys are: `topic`, `lastWillID`.
 
 The naming of the keys follows [Google's JSON style guide][json-style] and as
 such are in *camelCase*. However, `ID` is always fully uppercase and any
@@ -150,6 +147,15 @@ Similarly, we expect that in order to get and set the value of a feature a
 topics are named differently you have to specify a `getTopic` and a `setTopic`
 key that have the full path to a topic (so not necessarily nested under the
 "root" topic) that should be used instead.
+
+### `topic`
+
+The "root" topic of this device, for example `lightbulb/kitchen`. This may also
+be the name that you publish to underneath announce, so `announce/lightbulb/kitchen`
+is entirely valid and will be used as the root topic unless the `topic` key is present.
+
+If you publish as `announce/lightbulb/kitchen` but the topic is set to `light/kitchen`
+the `topic` in meta takes precedence.
 
 ### `lastWillID`
 
