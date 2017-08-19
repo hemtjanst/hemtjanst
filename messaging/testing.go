@@ -7,13 +7,17 @@ import (
 
 // TestingMessenger is a no-op messenger useful for when running tests
 type TestingMessenger struct {
-	Client   mq.Client
+	client   mq.Client
 	Action   string
 	Topic    []string
 	Message  []byte
 	Qos      int
 	Persist  bool
 	Callback func(Message)
+}
+
+func NewTestingMessenger(client mq.Client) PublishSubscriber {
+	return &TestingMessenger{client: client}
 }
 
 func (tm *TestingMessenger) Publish(topic string, message []byte, qos int, persist bool) {
