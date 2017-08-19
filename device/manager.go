@@ -42,44 +42,14 @@ func NewManager(c messaging.PublishSubscriber, initChan chan bool) *Manager {
 func (m *Manager) Add(topic string, meta []byte) {
 	var dev *Device
 	var existing bool
-	// If meta is empty, device should be deleted permanently
-	del := len(meta) == 0
 	if dev, existing = m.devices[topic]; !existing {
 		log.Print("Got announce for new device ", topic)
 		dev = &Device{Topic: topic, transport: m.client}
 	}
-	if del {
-		if existing {
-			log.Print("Got remove for device ", topic)
-			// Got empty payload, remove device
-			m.Lock()
-			defer m.Unlock()
-			m.forHandler(func(handler Handler) {
-				handler.Removed(dev)
-			})
-
-			// Loop through all topics and add to slice first
-			// instead of calling unsubscribe() on every feature
-			topics := make([]string, len(dev.Features))
-			for _, ft := range dev.Features {
-				if ft.GetTopic != "" {
-					log.Print("Unsubscribing from ", topic)
-					topics = append(topics, ft.GetTopic)
-				}
-			}
-			if len(topics) > 0 {
-				m.client.Unsubscribe(topics...)
-			}
-
-			// Forget device
-			delete(m.devices, topic)
-			return
-		}
-		log.Print("Got remove for (non-existing) device ", topic)
-		return
-	}
 	log.Print("Processing meta for device ", topic)
 
+	m.Lock()
+	defer m.Unlock()
 	err := json.Unmarshal(meta, dev)
 	dev.Reachable = m.init
 	if err != nil {
@@ -101,8 +71,6 @@ func (m *Manager) Add(topic string, meta []byte) {
 	})
 
 	if !existing {
-		m.Lock()
-		defer m.Unlock()
 		m.devices[topic] = dev
 	}
 }
@@ -123,6 +91,39 @@ func (m *Manager) GetAll() map[string]*Device {
 	return m.devices
 }
 
+func (m *Manager) Remove(msg string) {
+	m.Lock()
+	defer m.Unlock()
+	var dev *Device
+	var existing bool
+	if dev, existing = m.devices[msg]; !existing {
+		log.Print("Got remove for (non-existing) device ", msg)
+		return
+	}
+	log.Print("Got remove for device ", msg)
+	// Got empty payload, remove device
+	go m.forHandler(func(handler Handler) {
+		handler.Removed(dev)
+	})
+
+	// Loop through all topics and add to slice first
+	// instead of calling unsubscribe() on every feature
+	topics := make([]string, len(dev.Features))
+	for _, ft := range dev.Features {
+		if ft.GetTopic != "" {
+			log.Print("Unsubscribing from ", ft.GetTopic)
+			topics = append(topics, ft.GetTopic)
+		}
+	}
+	if len(topics) > 0 {
+		m.client.Unsubscribe(topics...)
+	}
+
+	// Forget device
+	delete(m.devices, msg)
+	return
+}
+
 func (m *Manager) Leave(msg string) {
 	log.Print("Attempting to remove device ", msg)
 	m.Lock()
@@ -140,6 +141,8 @@ func (m *Manager) Leave(msg string) {
 }
 
 func (m *Manager) forHandler(f func(handler Handler)) {
+	m.RLock()
+	defer m.RUnlock()
 	for _, h := range m.handlers {
 		f(h)
 	}

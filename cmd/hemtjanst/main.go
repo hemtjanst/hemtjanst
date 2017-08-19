@@ -150,6 +150,12 @@ loop:
 				log.Printf("Ignoring: Malformed topic %s", newReg)
 				continue
 			}
+			if len(msg.Payload()) == 0 {
+				// Empty payload, remove device
+				go manager.Remove(newReg)
+				continue
+			}
+
 			go manager.Add(newReg, msg.Payload())
 		case msg := <-leave:
 			go manager.Leave(string(msg.Payload()))

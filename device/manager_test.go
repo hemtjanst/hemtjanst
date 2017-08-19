@@ -88,13 +88,23 @@ func TestManagerRemove(t *testing.T) {
 	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	mn.Add("contactSensor/kitchen", []byte(`{}`))
 
-	mn.Add("lightbulb/kitchen", []byte(""))
+	mn.Remove("lightbulb/kitchen")
 	if len(mn.devices) != 1 {
 		t.Error("Expected 1 device, got ", len(mn.devices))
 	}
+}
+func TestManagerLeave(t *testing.T) {
+	c := &messaging.TestingMQTTClient{}
+	m := messaging.NewTestingMessenger(c)
+	mn := NewManager(m, nil)
 
 	mn.Add("contactSensor/bathroom", []byte(`{}`))
 	mn.devices["contactSensor/bathroom"].LastWillID = "ted"
+
+	if !mn.devices["contactSensor/bathroom"].Reachable {
+		t.Error("Expected contactSensor/bathroom to be reachable")
+	}
+
 	mn.Leave("ted")
 
 	if mn.devices["contactSensor/bathroom"].Reachable {
