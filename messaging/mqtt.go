@@ -17,6 +17,8 @@ type Handler struct {
 	AnnounceTopic string
 	LeaveTopic    string
 	DiscoverTopic string
+	DiscoverDelay time.Duration
+	DiscoverStart chan bool
 }
 
 // RetryWithBackoff will retry the operation for the amount of attempts. The
@@ -75,6 +77,13 @@ func (h *Handler) OnConnect(c mq.Client) {
 			log.Fatal("Could not subscribe to leave topic")
 		}
 		log.Print("Subscribed to leave topic")
+	}
+
+	if h.DiscoverDelay > 0 {
+		<-time.After(h.DiscoverDelay)
+	}
+	if h.DiscoverStart != nil {
+		h.DiscoverStart <- true
 	}
 
 	if h.DiscoverTopic != "" {

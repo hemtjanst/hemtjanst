@@ -15,7 +15,7 @@ func init() {
 func TestNewManager(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
 	if mn.client != m {
 		t.Error("Manager is missing a PublishSubsciber")
@@ -31,7 +31,7 @@ func TestNewManager(t *testing.T) {
 func TestManagerAdd(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
 	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	if len(mn.devices) != 1 {
@@ -48,7 +48,7 @@ func TestManagerAdd(t *testing.T) {
 func TestManagerGet(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
 	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	_, err := mn.Get("lightbulb/kitchen")
@@ -64,7 +64,7 @@ func TestManagerGet(t *testing.T) {
 func TestManagerGetAll(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
 	devs := mn.GetAll()
 	if len(devs) > 0 {
@@ -83,7 +83,7 @@ func TestManagerGetAll(t *testing.T) {
 func TestManagerRemove(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
 	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	mn.Add("contactSensor/kitchen", []byte(`{}`))
@@ -105,7 +105,7 @@ func TestManagerRemove(t *testing.T) {
 func TestManagerAddHandler(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
 	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	h := &TestingDeviceHandler{}

@@ -48,6 +48,8 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	announce := make(chan messaging.Message)
 	leave := make(chan messaging.Message)
+	handlerInit := make(chan bool)
+	managerInit := make(chan bool)
 
 	bridgeConfig := bridge.Config{
 		Pin:         *pin,
@@ -69,6 +71,10 @@ func main() {
 		AnnounceTopic: announceTopicPrefix + "#",
 		LeaveTopic:    leaveTopic,
 		DiscoverTopic: discoverTopic,
+		// Wait 5 seconds before sending discover to allow
+		// persistent announcements to be fetched
+		DiscoverDelay: 5 * time.Second,
+		DiscoverStart: handlerInit,
 	}
 	cID := flagmqtt.NewUniqueIdentifier()
 	conf := flagmqtt.ClientConfig{
@@ -97,17 +103,24 @@ func main() {
 		log.Fatal("Could not start HomeKit bridge: ", err)
 	}
 
-	manager := device.NewManager(messaging.NewMQTTMessenger(c))
+	manager := device.NewManager(messaging.NewMQTTMessenger(c), managerInit)
 	log.Print("Started device manager")
 
 	hk := homekit.NewHomekit(hkBridge, manager)
-	manager.AddHandler(hk)
 
 	go func() {
-		<-time.After(2 * time.Second)
+		// Wait for handler to have sent its discover
+		<-handlerInit
+
+		// Tell manager that we're initialised
+		managerInit <- true
+
+		// Wait a few more seconds before starting bridge
+		<-time.After(5 * time.Second)
+		log.Print("Starting HomeKit bridge")
+		manager.AddHandler(hk)
 		hkBridge.Start()
 	}()
-	log.Print("Started HomeKit bridge")
 
 	if *startWeb {
 		go func() {

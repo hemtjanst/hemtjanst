@@ -17,15 +17,26 @@ type Manager struct {
 	devices  map[string]*Device
 	handlers []Handler
 	client   messaging.PublishSubscriber
+	init     bool
 	sync.RWMutex
 }
 
-func NewManager(c messaging.PublishSubscriber) *Manager {
-	return &Manager{
+func NewManager(c messaging.PublishSubscriber, initChan chan bool) *Manager {
+	m := &Manager{
 		client:   c,
 		devices:  make(map[string]*Device, 10),
 		handlers: []Handler{},
+		// Set init to true if initChan is missing, otherwise wait for a init signal
+		init: initChan == nil,
 	}
+	if initChan != nil {
+		go func() {
+			<-initChan
+			m.init = true
+		}()
+	}
+
+	return m
 }
 
 func (m *Manager) Add(topic string, meta []byte) {
@@ -70,7 +81,7 @@ func (m *Manager) Add(topic string, meta []byte) {
 	log.Print("Processing meta for device ", topic)
 
 	err := json.Unmarshal(meta, dev)
-	dev.Reachable = true
+	dev.Reachable = m.init
 	if err != nil {
 		log.Print(err)
 		return
