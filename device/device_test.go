@@ -29,7 +29,7 @@ func TestNewDevice(t *testing.T) {
 func TestPublishMeta(t *testing.T) {
 	m := &messaging.TestingMessenger{}
 	d := NewDevice("lightbulb/kitchen", m)
-	err := d.PublishMeta("announce/")
+	err := d.PublishMeta()
 	if err != nil {
 		t.Error("Expected to successfully publish meta, got ", err)
 	}

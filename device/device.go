@@ -38,12 +38,12 @@ func (d *Device) HasFeature(feature string) bool {
 	return false
 }
 
-func (d *Device) PublishMeta(prefix string) error {
+func (d *Device) PublishMeta() error {
 	js, err := json.Marshal(d)
 	if err != nil {
 		return err
 	}
-	d.transport.Publish(prefix + d.Topic, js, 1, true)
+	d.transport.Publish("announce/"+d.Topic, js, 1, true)
 	return nil
 }
 
