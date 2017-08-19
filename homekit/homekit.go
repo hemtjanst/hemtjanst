@@ -26,17 +26,7 @@ func (h *Homekit) Updated(d *device.Device) {
 	h.lock.Lock()
 	defer h.lock.Unlock()
 	if val, ok := h.devices[d.Topic]; ok {
-		val.device = d
-
-		oldAcc := val.accessory
-		newAcc := createAccessoryFromDevice(d)
-		util.SetReachability(newAcc, d.Reachable)
-
-		if !newAcc.Equal(oldAcc) {
-			val.accessory = newAcc
-			h.bridge.ReplaceAccessory(oldAcc, newAcc)
-		}
-
+		val.deviceUpdate(d)
 	} else {
 		newDev, err := newDeviceHolder(d)
 		if err != nil {
