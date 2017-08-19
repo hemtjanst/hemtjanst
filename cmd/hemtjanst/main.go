@@ -26,6 +26,9 @@ var (
 	startWeb = flag.Bool("web.ui", false, "Start the built-in web UI")
 	wAddr    = flag.String("web.addr", ":8080", "IP/host:port to bind the webinterface to")
 	dbPath   = flag.String("db.path", "./db", "Path to store the database with HomeKit key pairs etc.")
+	hVersion = flag.Bool("version", false, "Print the version")
+
+	version = "master"
 )
 
 const (
@@ -42,6 +45,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\n")
 	}
 	flag.Parse()
+	if *hVersion {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	log.Print("Initialing Hemtjänst")
 	quit := make(chan os.Signal)

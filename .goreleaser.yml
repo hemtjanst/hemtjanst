@@ -1,0 +1,21 @@
+builds:
+  - binary: hemtjanst
+    main: ./cmd/hemtjanst/main.go
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm
+    goarm:
+      - 6
+      - 7
+archive:
+  files:
+    - LICENSE
+    - README.md
+    - CHANGELOG.md
+  format_overrides:
+    - goos: windows
+      format: zip
