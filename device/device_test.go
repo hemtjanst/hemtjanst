@@ -16,6 +16,14 @@ func TestNewDevice(t *testing.T) {
 	if d.HasFeature("") {
 		t.Error("Expected false, got ", d.HasFeature(""))
 	}
+
+	f := &Feature{GetTopic: "lightbulb/on/get", SetTopic: "lightbulb/on/set", devRef: d}
+	d.Features = map[string]*Feature{}
+	d.Features["on"] = f
+
+	if !d.HasFeature("on") {
+		t.Error("Expected true, got ", d.HasFeature("on"))
+	}
 }
 
 func TestPublishMeta(t *testing.T) {
