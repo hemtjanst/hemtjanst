@@ -123,3 +123,11 @@ func (m *Manager) AddHandler(handler DeviceHandler) {
 		}
 	}()
 }
+
+// TestingDeviceHandler is a noop device handler. It is meant to
+// be used in tests.
+type TestingDeviceHandler struct{}
+
+func (t *TestingDeviceHandler) DeviceUpdated(*Device) {}
+func (t *TestingDeviceHandler) DeviceLeave(*Device)   {}
+func (t *TestingDeviceHandler) DeviceRemoved(*Device) {}
