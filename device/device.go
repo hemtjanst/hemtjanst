@@ -6,7 +6,7 @@ import (
 )
 
 type Device struct {
-	Topic        string
+	Topic        string              `json:"topic"`
 	Name         string              `json:"name"`
 	Manufacturer string              `json:"manufacturer"`
 	Model        string              `json:"model"`
@@ -14,6 +14,7 @@ type Device struct {
 	Type         string              `json:"type"`
 	LastWillID   string              `json:"lastWillID,omitempty"`
 	Features     map[string]*Feature `json:"feature"`
+	Reachable    bool                `json:"-"`
 	transport    messaging.PublishSubscriber
 }
 
@@ -37,12 +38,12 @@ func (d *Device) HasFeature(feature string) bool {
 	return false
 }
 
-func (d *Device) PublishMeta() error {
+func (d *Device) PublishMeta(prefix string) error {
 	js, err := json.Marshal(d)
 	if err != nil {
 		return err
 	}
-	d.transport.Publish(d.Topic+"/meta", js, 1, true)
+	d.transport.Publish(prefix + d.Topic, js, 1, true)
 	return nil
 }
 

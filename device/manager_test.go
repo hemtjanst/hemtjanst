@@ -15,7 +15,7 @@ func init() {
 func TestNewManager(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
 	if mn.client != m {
 		t.Error("Manager is missing a PublishSubsciber")
@@ -31,15 +31,15 @@ func TestNewManager(t *testing.T) {
 func TestManagerAdd(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
-	mn.Add("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	if len(mn.devices) != 1 {
 		t.Error("Expected only 1 device, have ", len(mn.devices))
 	}
 
 	// Add the same device again, nothing should happen
-	mn.Add("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	if len(mn.devices) != 1 {
 		t.Error("Expected only 1 device, have ", len(mn.devices))
 	}
@@ -48,9 +48,9 @@ func TestManagerAdd(t *testing.T) {
 func TestManagerGet(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
-	mn.Add("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	_, err := mn.Get("lightbulb/kitchen")
 	if err != nil {
 		t.Error("Expected to find device")
@@ -64,15 +64,15 @@ func TestManagerGet(t *testing.T) {
 func TestManagerGetAll(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
 	devs := mn.GetAll()
 	if len(devs) > 0 {
 		t.Error("Expected 0 devices, got ", len(devs))
 	}
 
-	mn.Add("lightbulb/kitchen")
-	mn.Add("contactSensor/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
+	mn.Add("contactSensor/kitchen", []byte(`{}`))
 
 	devs = mn.GetAll()
 	if len(devs) != 2 {
@@ -83,30 +83,41 @@ func TestManagerGetAll(t *testing.T) {
 func TestManagerRemove(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
-	mn.Add("lightbulb/kitchen")
-	mn.Add("contactSensor/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
+	mn.Add("contactSensor/kitchen", []byte(`{}`))
 
 	mn.Remove("lightbulb/kitchen")
 	if len(mn.devices) != 1 {
 		t.Error("Expected 1 device, got ", len(mn.devices))
 	}
+}
+func TestManagerLeave(t *testing.T) {
+	c := &messaging.TestingMQTTClient{}
+	m := messaging.NewTestingMessenger(c)
+	mn := NewManager(m, nil)
 
-	mn.Add("contactSensor/bathroom")
+	mn.Add("contactSensor/bathroom", []byte(`{}`))
 	mn.devices["contactSensor/bathroom"].LastWillID = "ted"
-	mn.Remove("ted")
-	if len(mn.devices) != 1 {
-		t.Error("Expected 1 device, got ", len(mn.devices))
+
+	if !mn.devices["contactSensor/bathroom"].Reachable {
+		t.Error("Expected contactSensor/bathroom to be reachable")
+	}
+
+	mn.Leave("ted")
+
+	if mn.devices["contactSensor/bathroom"].Reachable {
+		t.Error("Expected contactSensor/bathroom to be unreachable")
 	}
 }
 
 func TestManagerAddHandler(t *testing.T) {
 	c := &messaging.TestingMQTTClient{}
 	m := messaging.NewTestingMessenger(c)
-	mn := NewManager(m)
+	mn := NewManager(m, nil)
 
-	mn.Add("lightbulb/kitchen")
+	mn.Add("lightbulb/kitchen", []byte(`{}`))
 	h := &TestingDeviceHandler{}
 	mn.AddHandler(h)
 

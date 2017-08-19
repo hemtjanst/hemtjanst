@@ -5,11 +5,24 @@ import (
 	"strings"
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 )
 
 func TopicToInt64(topic string) int64 {
 	sum := sha256.Sum256([]byte(topic))
 	return int64(binary.BigEndian.Uint64(append([]byte{0x0F}, sum[:7]...)))
+}
+
+func HexToInt64(hexStr string, def int64) int64 {
+	if b, err := hex.DecodeString(hexStr); err == nil {
+		var ret int64 = 0
+		for i := len(b) - 1; i >= 0; i-- {
+			ret = ret<<8 + int64(b[i])
+		}
+		// Static addition to avoid collision with auto-assigned ID:s
+		return ret + 0x100000000
+	}
+	return def
 }
 
 func AccessoryType(t string) accessory.AccessoryType {

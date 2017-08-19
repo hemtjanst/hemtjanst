@@ -8,58 +8,71 @@ import (
 	"sync"
 )
 
-type DeviceHandler interface {
-	DeviceUpdated(*Device)
-	DeviceLeave(*Device)
-	DeviceRemoved(*Device)
+type Handler interface {
+	Updated(*Device)
+	Removed(*Device)
 }
 
 type Manager struct {
 	devices  map[string]*Device
-	handlers []DeviceHandler
+	handlers []Handler
 	client   messaging.PublishSubscriber
+	init     bool
 	sync.RWMutex
 }
 
-func NewManager(c messaging.PublishSubscriber) *Manager {
-	return &Manager{
+func NewManager(c messaging.PublishSubscriber, initChan chan bool) *Manager {
+	m := &Manager{
 		client:   c,
 		devices:  make(map[string]*Device, 10),
-		handlers: []DeviceHandler{},
+		handlers: []Handler{},
+		// Set init to true if initChan is missing, otherwise wait for a init signal
+		init: initChan == nil,
 	}
+	if initChan != nil {
+		go func() {
+			<-initChan
+			m.init = true
+		}()
+	}
+
+	return m
 }
 
-func (m *Manager) Add(topic string) {
-	if _, ok := m.devices[topic]; ok {
-		log.Print("Got announce for existing device ", topic)
-		return
+func (m *Manager) Add(topic string, meta []byte) {
+	var dev *Device
+	var existing bool
+	if dev, existing = m.devices[topic]; !existing {
+		log.Print("Got announce for new device ", topic)
+		dev = &Device{Topic: topic, transport: m.client}
 	}
-	log.Print("Going to add device ", topic)
-	dev := &Device{Topic: topic, transport: m.client}
-	m.client.Subscribe(fmt.Sprintf("%s/meta", topic), 1, func(msg messaging.Message) {
-		err := json.Unmarshal(msg.Payload(), dev)
-		if err != nil {
-			log.Print(err)
-			return
-		}
-		for name, ft := range dev.Features {
-			if ft.SetTopic == "" {
-				ft.SetTopic = fmt.Sprintf("%s/%s/set", topic, name)
-			}
-			if ft.GetTopic == "" {
-				ft.GetTopic = fmt.Sprintf("%s/%s/get", topic, name)
-			}
-			ft.devRef = dev
-		}
-
-		go m.forHandler(func(handler DeviceHandler) {
-			handler.DeviceUpdated(dev)
-		})
-	})
+	log.Print("Processing meta for device ", topic)
 
 	m.Lock()
 	defer m.Unlock()
-	m.devices[topic] = dev
+	err := json.Unmarshal(meta, dev)
+	dev.Reachable = m.init
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	for name, ft := range dev.Features {
+		if ft.SetTopic == "" {
+			ft.SetTopic = fmt.Sprintf("%s/%s/set", topic, name)
+		}
+		if ft.GetTopic == "" {
+			ft.GetTopic = fmt.Sprintf("%s/%s/get", topic, name)
+		}
+		ft.devRef = dev
+	}
+
+	go m.forHandler(func(handler Handler) {
+		handler.Updated(dev)
+	})
+
+	if !existing {
+		m.devices[topic] = dev
+	}
 }
 
 func (m *Manager) Get(id string) (*Device, error) {
@@ -79,47 +92,69 @@ func (m *Manager) GetAll() map[string]*Device {
 }
 
 func (m *Manager) Remove(msg string) {
+	m.Lock()
+	defer m.Unlock()
+	var dev *Device
+	var existing bool
+	if dev, existing = m.devices[msg]; !existing {
+		log.Print("Got remove for (non-existing) device ", msg)
+		return
+	}
+	log.Print("Got remove for device ", msg)
+	// Got empty payload, remove device
+	go m.forHandler(func(handler Handler) {
+		handler.Removed(dev)
+	})
+
+	// Loop through all topics and add to slice first
+	// instead of calling unsubscribe() on every feature
+	topics := make([]string, len(dev.Features))
+	for _, ft := range dev.Features {
+		if ft.GetTopic != "" {
+			log.Print("Unsubscribing from ", ft.GetTopic)
+			topics = append(topics, ft.GetTopic)
+		}
+	}
+	if len(topics) > 0 {
+		m.client.Unsubscribe(topics...)
+	}
+
+	// Forget device
+	delete(m.devices, msg)
+	return
+}
+
+func (m *Manager) Leave(msg string) {
 	log.Print("Attempting to remove device ", msg)
 	m.Lock()
 	defer m.Unlock()
-	if val, ok := m.devices[msg]; ok {
-		log.Print("Found device, unsubscribing and removing")
-		m.client.Unsubscribe(fmt.Sprintf("%s/meta", msg))
-		for _, ft := range val.Features {
-			m.client.Unsubscribe(ft.GetTopic)
-		}
-
-		go m.forHandler(func(handler DeviceHandler) {
-			handler.DeviceLeave(val)
-		})
-
-		delete(m.devices, msg)
-		return
-	}
 	for _, d := range m.devices {
-		if d.LastWillID == msg {
-			log.Print("Found device match for LastWillUID, calling Remove")
-			go m.forHandler(func(handler DeviceHandler) {
-				handler.DeviceLeave(d)
+		if d.LastWillID == msg || d.Topic == msg {
+			log.Printf("Found: %s, setting unreachable", d.Topic)
+			d.Reachable = false
+			dev := d
+			go m.forHandler(func(handler Handler) {
+				handler.Updated(dev)
 			})
-			delete(m.devices, d.Topic)
 		}
 	}
 }
 
-func (m *Manager) forHandler(f func(handler DeviceHandler)) {
+func (m *Manager) forHandler(f func(handler Handler)) {
+	m.RLock()
+	defer m.RUnlock()
 	for _, h := range m.handlers {
 		f(h)
 	}
 }
 
-func (m *Manager) AddHandler(handler DeviceHandler) {
+func (m *Manager) AddHandler(handler Handler) {
 	m.Lock()
 	defer m.Unlock()
 	m.handlers = append(m.handlers, handler)
 	go func() {
 		for _, device := range m.devices {
-			handler.DeviceUpdated(device)
+			handler.Updated(device)
 		}
 	}()
 }
@@ -128,6 +163,5 @@ func (m *Manager) AddHandler(handler DeviceHandler) {
 // be used in tests.
 type TestingDeviceHandler struct{}
 
-func (t *TestingDeviceHandler) DeviceUpdated(*Device) {}
-func (t *TestingDeviceHandler) DeviceLeave(*Device)   {}
-func (t *TestingDeviceHandler) DeviceRemoved(*Device) {}
+func (t *TestingDeviceHandler) Updated(*Device) {}
+func (t *TestingDeviceHandler) Removed(*Device) {}

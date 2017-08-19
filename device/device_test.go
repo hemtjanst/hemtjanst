@@ -29,7 +29,7 @@ func TestNewDevice(t *testing.T) {
 func TestPublishMeta(t *testing.T) {
 	m := &messaging.TestingMessenger{}
 	d := NewDevice("lightbulb/kitchen", m)
-	err := d.PublishMeta()
+	err := d.PublishMeta("announce/")
 	if err != nil {
 		t.Error("Expected to successfully publish meta, got ", err)
 	}
@@ -37,8 +37,8 @@ func TestPublishMeta(t *testing.T) {
 	if m.Action != "publish" {
 		t.Error("Expected to publish, but tried to ", m.Action)
 	}
-	if !reflect.DeepEqual(m.Topic, []string{"lightbulb/kitchen/meta"}) {
-		t.Error("Expected topic to be lightbulb/kitchen/meta, got ", m.Topic)
+	if !reflect.DeepEqual(m.Topic, []string{"announce/lightbulb/kitchen"}) {
+		t.Error("Expected topic to be announce/lightbulb/kitchen, got ", m.Topic)
 	}
 	if m.Qos != 1 {
 		t.Error("Expected QoS of 1, got ", m.Qos)
@@ -46,7 +46,7 @@ func TestPublishMeta(t *testing.T) {
 	if !m.Persist {
 		t.Error("Expected persist, got ", m.Persist)
 	}
-	msg := `{"Topic":"lightbulb/kitchen","name":"","manufacturer":"","model":"","serialNumber":"","type":"","feature":null}`
+	msg := `{"topic":"lightbulb/kitchen","name":"","manufacturer":"","model":"","serialNumber":"","type":"","feature":null}`
 	if !bytes.Equal(m.Message, []byte(msg)) {
 		t.Errorf("Expected %s, got %s", msg, string(m.Message))
 	}
