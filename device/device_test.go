@@ -46,7 +46,7 @@ func TestPublishMeta(t *testing.T) {
 	if !m.Persist {
 		t.Error("Expected persist, got ", m.Persist)
 	}
-	msg := `{"Topic":"lightbulb/kitchen","name":"","manufacturer":"","model":"","serialNumber":"","type":"","feature":null}`
+	msg := `{"topic":"lightbulb/kitchen","name":"","manufacturer":"","model":"","serialNumber":"","type":"","feature":null}`
 	if !bytes.Equal(m.Message, []byte(msg)) {
 		t.Errorf("Expected %s, got %s", msg, string(m.Message))
 	}

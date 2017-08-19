@@ -6,7 +6,7 @@ import (
 )
 
 type Device struct {
-	Topic        string
+	Topic        string              `json:"topic"`
 	Name         string              `json:"name"`
 	Manufacturer string              `json:"manufacturer"`
 	Model        string              `json:"model"`
