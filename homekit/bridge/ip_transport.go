@@ -59,8 +59,6 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		log.Info.Panic("Invalid empty name for first accessory")
 	}
 
-	log.Debug.Enable()
-
 	cfg := defaultConfig(name)
 	cfg.merge(config)
 
