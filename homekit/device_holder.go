@@ -63,7 +63,7 @@ func (h *deviceHolder) onHomekitUpdate(c string, value interface{}) {
 func (h *deviceHolder) onUpdate(c, value string) {
 	log.Printf("onUpdate(%s, %s) on device %s\n", c, value, h.device.Topic)
 	if ch, ok := h.characteristics[c]; ok {
-		log.Printf("Found characteristic")
+		log.Print("Found characteristic: ", c)
 		ch.UpdateValue(value)
 	}
 }
