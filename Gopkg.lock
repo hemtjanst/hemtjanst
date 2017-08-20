@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/grandcat/zeroconf"
   packages = ["."]
-  revision = "e4a16e81aad43bf839b50c68f08488c3e865f707"
+  revision = "2f133dcabb8c1dc0e63ec6bb9e2c405179db3033"
 
 [[projects]]
   branch = "master"
