@@ -47,7 +47,7 @@ func (s *MDNSService) Publish() error {
 		stripped = puny
 	}
 
-	server, err := zeroconf.RegisterProxy(stripped, "_hap._tcp.", "", s.config.servePort, host, []string{s.config.IP}, text, []net.Interface{})
+	server, err := zeroconf.RegisterProxy(stripped, "_hap._tcp.", "local", s.config.servePort, host, []string{s.config.IP}, text, []net.Interface{})
 	if err != nil {
 		log.Info.Panic(err)
 	}
