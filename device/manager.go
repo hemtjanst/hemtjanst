@@ -99,7 +99,7 @@ func (m *Manager) Remove(msg string) {
 
 	// Loop through all topics and add to slice first
 	// instead of calling unsubscribe() on every feature
-	topics := make([]string, len(dev.Features))
+	topics := []string{}
 	for _, ft := range dev.Features {
 		if ft.GetTopic != "" {
 			log.Print("Unsubscribing from ", ft.GetTopic)
