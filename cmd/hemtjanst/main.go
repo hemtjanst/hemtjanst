@@ -114,6 +114,7 @@ func main() {
 	log.Print("Started device manager")
 
 	hk := homekit.NewHomekit(hkBridge, manager)
+	manager.AddHandler(hk)
 
 	go func() {
 		// Wait for handler to have sent its discover
@@ -125,7 +126,6 @@ func main() {
 		// Wait a few more seconds before starting bridge
 		<-time.After(5 * time.Second)
 		log.Print("Starting HomeKit bridge")
-		manager.AddHandler(hk)
 		hkBridge.Start()
 	}()
 
