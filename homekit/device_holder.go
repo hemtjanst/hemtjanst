@@ -72,8 +72,12 @@ func (h *deviceHolder) deviceUpdate(d *device.Device) {
 	h.device = d
 	util.SetReachability(h.accessory, d.Reachable)
 
-	// TODO
-	// h.updateAccessory()
+	for name, feature := range h.device.Features {
+		chName := name
+		feature.OnUpdate(func(msg messaging.Message) {
+			h.onUpdate(chName, string(msg.Payload()))
+		})
+	}
 }
 
 func (h *deviceHolder) createAccessory() (err error) {
