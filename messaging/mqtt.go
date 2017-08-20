@@ -81,9 +81,11 @@ func (h *Handler) OnConnect(c mq.Client) {
 
 	if h.DiscoverDelay > 0 {
 		<-time.After(h.DiscoverDelay)
+		h.DiscoverDelay = 0
 	}
 	if h.DiscoverStart != nil {
 		h.DiscoverStart <- true
+		h.DiscoverStart = nil
 	}
 
 	if h.DiscoverTopic != "" {
