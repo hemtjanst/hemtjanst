@@ -70,6 +70,7 @@ func NewPersistentMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 		SetMessageChannelDepth(100).
 		SetPingTimeout(time.Duration(pingTimeout) * time.Second).
 		SetProtocolVersion(4).
+		SetOrderMatters(false).
 		SetWriteTimeout(time.Duration(writeTimeout) * time.Second)
 
 	if config.OnConnectHandler != nil {
