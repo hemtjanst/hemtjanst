@@ -82,7 +82,7 @@ func (h *deviceHolder) deviceUpdate(d *device.Device) {
 
 func (h *deviceHolder) createAccessory() (err error) {
 	if h.accessory != nil {
-		return fmt.Errorf("Accessory already created for device %s", h.device.Topic)
+		return fmt.Errorf("accessory already created for device %s", h.device.Topic)
 	}
 
 	info := accessory.Info{
@@ -101,6 +101,10 @@ func (h *deviceHolder) createAccessory() (err error) {
 }
 func (h *deviceHolder) updateAccessory() (err error) {
 	sType := util.ServiceType(h.device.Type)
+
+	if sType == "" {
+		return fmt.Errorf("unknown type %s", h.device.Type)
+	}
 
 	// TODO: Compare with current service/characteristics if any are set
 	//       instead of creating new ones.

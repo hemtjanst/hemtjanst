@@ -92,6 +92,6 @@ func ServiceType(t string) string {
 	case "windowcovering":
 		return service.TypeWindowCovering
 	default:
-		return service.TypeSwitch
+		return ""
 	}
 }
