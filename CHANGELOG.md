@@ -13,5 +13,5 @@ runs successfully at home.
 Out of the box it supports just about every HomeKit service and characteristic
 and will create the appropriate devices for you.
 
-[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/hemtjanst/hemtjanst/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/hemtjanst/hemtjanst/compare/6f3a696c96f968e1b57d0eec29300e30d48add69...v0.1.0
