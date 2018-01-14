@@ -49,16 +49,14 @@ func NewPersistentMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 	if useTls {
 		tlsCfg, err = setupTLS(caPath, certPath, keyPath)
 		if err != nil {
-			return
+			return nil, err
 		}
 	}
 
 	clientId := config.ClientID
 
 	if clientId == "" {
-		var rndUuid uuid.UUID
-		rndUuid = uuid.NewV4()
-		clientId = rndUuid.String()
+		clientId = NewUniqueIdentifier()
 	}
 
 	opts := mq.NewClientOptions().
