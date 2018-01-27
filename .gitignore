@@ -15,3 +15,6 @@
 
 # Go vendor directory
 vendor/
+
+.tool-versions
+db/
