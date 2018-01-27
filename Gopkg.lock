@@ -4,26 +4,53 @@
 [[projects]]
   branch = "master"
   name = "github.com/agl/ed25519"
-  packages = [".","edwards25519"]
+  packages = [
+    ".",
+    "edwards25519"
+  ]
   revision = "5312a61534124124185d41f09206b9fef1d88403"
 
 [[projects]]
   branch = "master"
-  name = "github.com/brutella/hc"
-  packages = ["accessory","characteristic","crypto","crypto/chacha20poly1305","crypto/curve25519","crypto/hkdf","db","event","hap","hap/controller","hap/data","hap/endpoint","hap/http","hap/pair","log","service","util"]
-  revision = "5f75b70715efe858574e7d6719878ce060693db1"
+  name = "github.com/brutella/dnssd"
+  packages = [
+    ".",
+    "log"
+  ]
+  revision = "75c3c0c65b2b195ff1805209b88907db71aad88f"
 
 [[projects]]
-  name = "github.com/cenkalti/backoff"
-  packages = ["."]
-  revision = "32cd0c5b3aef12c76ed64aaf678f6c79736be7dc"
-  version = "v1.0.0"
+  branch = "master"
+  name = "github.com/brutella/hc"
+  packages = [
+    "accessory",
+    "characteristic",
+    "crypto",
+    "crypto/chacha20poly1305",
+    "crypto/curve25519",
+    "crypto/hkdf",
+    "db",
+    "event",
+    "hap",
+    "hap/controller",
+    "hap/data",
+    "hap/endpoint",
+    "hap/http",
+    "hap/pair",
+    "log",
+    "service",
+    "util"
+  ]
+  revision = "b50d8bf0877cdac0b9d115c40828be5bc21d33b0"
 
 [[projects]]
   branch = "master"
   name = "github.com/eclipse/paho.mqtt.golang"
-  packages = [".","packets"]
-  revision = "720ed1a92c623623f00233e4bcd8d513d6e2fbe7"
+  packages = [
+    ".",
+    "packets"
+  ]
+  revision = "750c97f293745e8220737ef933da2ec829d2fddd"
 
 [[projects]]
   branch = "master"
@@ -32,22 +59,16 @@
   revision = "c20e083e31230b84ffa23c5d2fb0bc55f5292681"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/grandcat/zeroconf"
-  packages = ["."]
-  revision = "2f133dcabb8c1dc0e63ec6bb9e2c405179db3033"
-
-[[projects]]
-  branch = "master"
   name = "github.com/miekg/dns"
   packages = ["."]
-  revision = "bbca4873b326f5dc54bfe31148446d4ed79a5a02"
+  revision = "5ec25f2a5044291b6c8abf43ed8a201da241e69e"
+  version = "v1.0.3"
 
 [[projects]]
   name = "github.com/satori/go.uuid"
   packages = ["."]
-  revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
-  version = "v1.1.0"
+  revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -58,24 +79,34 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["chacha20poly1305","chacha20poly1305/internal/chacha20","curve25519","hkdf","poly1305"]
-  revision = "b176d7def5d71bdd214203491f89843ed217f420"
+  packages = [
+    "chacha20poly1305",
+    "curve25519",
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "hkdf",
+    "internal/chacha20",
+    "poly1305"
+  ]
+  revision = "13931e22f9e72ea58bb73048bc752b48c6d4d4ac"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["bpf","idna","internal/iana","internal/socket","ipv4","ipv6","proxy","websocket"]
-  revision = "1c05540f6879653db88113bc4a2b70aec4bd491f"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/text"
-  packages = ["internal/gen","internal/triegen","internal/ucd","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
-  revision = "b19bf474d317b857955b12035d2c5acb57ce8b01"
+  packages = [
+    "bpf",
+    "internal/iana",
+    "internal/socket",
+    "ipv4",
+    "ipv6",
+    "proxy",
+    "websocket"
+  ]
+  revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "410dc7964370d941f77079feadd3033d870cc4d7b6fe7beefcc645172e1b3012"
+  inputs-digest = "14d351e0dadaad586398f9614d6784009d201a9d0f246a0b29497f38118c4b0e"
   solver-name = "gps-cdcl"
   solver-version = 1
