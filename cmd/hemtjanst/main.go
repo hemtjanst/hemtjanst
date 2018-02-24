@@ -9,7 +9,6 @@ import (
 	"github.com/hemtjanst/hemtjanst/homekit/bridge"
 	"github.com/hemtjanst/hemtjanst/messaging"
 	"github.com/hemtjanst/hemtjanst/messaging/flagmqtt"
-	"github.com/hemtjanst/hemtjanst/web"
 	"log"
 	"os"
 	"os/signal"
@@ -23,8 +22,6 @@ var (
 	addr     = flag.String("address", "127.0.0.1", "IP or hostname for Hemtjänst to bind on")
 	port     = flag.String("port", "12345", "Port for Hemtjänst to bind on")
 	pin      = flag.String("pin", "01020304", "Pairing pin for the HomeKit bridge")
-	startWeb = flag.Bool("web.ui", false, "Start the built-in web UI")
-	wAddr    = flag.String("web.addr", ":8080", "IP/host:port to bind the webinterface to")
 	dbPath   = flag.String("db.path", "./db", "Path to store the database with HomeKit key pairs etc.")
 	hVersion = flag.Bool("version", false, "Print the version")
 
@@ -128,14 +125,6 @@ func main() {
 		log.Print("Starting HomeKit bridge")
 		hkBridge.Start()
 	}()
-
-	if *startWeb {
-		go func() {
-			<-time.After(5 * time.Second)
-			web.Serve(manager, *wAddr)
-		}()
-		log.Print("Started web interface")
-	}
 
 loop:
 	for {
