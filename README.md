@@ -18,10 +18,34 @@ them have a habit of making backwards incompatible changes. You'll need to follo
 installation guide first.
 
 After that you'll need to:
+* `mkdir -p $GOPATH/src/github.com/hemtjanst`
+* `cd $GOPATH/src/github.com/hemtjanst`
 * `git clone` the repo
 * `cd` into it
 * `dep ensure` to fetch the dependencies
 * `go build` to build the result or `go install`
+
+## Development
+
+Follow the same instructions as install but either clone your fork into
+`$GOPATH/src/github.com/hemtjanst`, or if you already did a `go get`
+before you can update the `origin` remote in git to point to your fork instead.
+
+For example:
+
+```
+git remote rename origin upstream
+git remote add origin git@github.com:your-workspace/your-fork.git
+```
+
+Or, if you cloned directly into the directory from your fork:
+
+```
+git remote add upstream git@github.com:hemtjanst/hemtjanst.git
+```
+
+Now if you want to pull in changes from `upstream`, i.e this repository you can
+`git fetch upstrseam` them and then `git merge upstream/master`, or whichever branch.
 
 ## Usage
 
