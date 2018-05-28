@@ -13,11 +13,15 @@ also be able to create bridges for other platforms, like SmartThings.
 
 ## Installation
 
-The binary is fully self-contained and can be installed by simply issuing a:
+[`dep`](https://github.com/golang/dep) is used to manage the dependencies as a number of
+them have a habit of making backwards incompatible changes. You'll need to follow `dep`'s
+installation guide first.
 
-```
-go install github.com/hemtjanst/hemtjanst/cmd/hemtjanst
-```
+After that you'll need to:
+* `git clone` the repo
+* `cd` into it
+* `dep ensure` to fetch the dependencies
+* `go build` to build the result or `go install`
 
 ## Usage
 
