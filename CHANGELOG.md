@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.3.1] - 2019-03-17
+Fix some mDNS related bugs.
+
 ## [0.3.0] - 2019-03-17
 This release upgrades all our dependencies. It now supports a number of
 new and updated accessories, characteristics and service definitions
@@ -26,7 +29,8 @@ runs successfully at home.
 Out of the box it supports just about every HomeKit service and characteristic
 and will create the appropriate devices for you.
 
-[Unreleased]: https://github.com/hemtjanst/hemtjanst/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/hemtjanst/hemtjanst/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/hemtjanst/hemtjanst/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/hemtjanst/hemtjanst/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/hemtjanst/hemtjanst/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/hemtjanst/hemtjanst/compare/6f3a696c96f968e1b57d0eec29300e30d48add69...v0.1.0
