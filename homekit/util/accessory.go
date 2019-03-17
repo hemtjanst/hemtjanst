@@ -1,11 +1,12 @@
 package util
 
 import (
-	"github.com/brutella/hc/accessory"
-	"strings"
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"strings"
+
+	"github.com/brutella/hc/accessory"
 )
 
 func TopicToInt64(topic string) int64 {
@@ -67,10 +68,16 @@ func AccessoryType(t string) accessory.AccessoryType {
 		return accessory.TypeHeater
 	case "airconditioner":
 		return accessory.TypeAirConditioner
-	case "humidifer":
+	case "humidifier":
 		return accessory.TypeHumidifier
 	case "dehumidifier":
 		return accessory.TypeDehumidifier
+	case "sprinklers":
+		return accessory.TypeSprinklers
+	case "faucets":
+		return accessory.TypeFaucets
+	case "showersystems":
+		return accessory.TypeShowerSystems
 	default:
 		return accessory.TypeUnknown
 	}

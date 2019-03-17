@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/brutella/hc/service"
 	"strings"
+
+	"github.com/brutella/hc/service"
 )
 
 func ServiceType(t string) string {
@@ -37,6 +38,8 @@ func ServiceType(t string) string {
 		return service.TypeFan
 	case "fanv2":
 		return service.TypeFanV2
+	case "faucet":
+		return service.TypeFaucet
 	case "filtermaintenance":
 		return service.TypeFilterMaintenance
 	case "garagedooropener":
@@ -47,6 +50,8 @@ func ServiceType(t string) string {
 		return service.TypeHumidifierDehumidifier
 	case "humiditysensor":
 		return service.TypeHumiditySensor
+	case "irrigationsystem":
+		return service.TypeIrrigationSystem
 	case "leaksensor":
 		return service.TypeLeakSensor
 	case "lightsensor":
@@ -67,6 +72,8 @@ func ServiceType(t string) string {
 		return service.TypeOutlet
 	case "securitysystem":
 		return service.TypeSecuritySystem
+	case "servicelabel":
+		return service.TypeServiceLabel
 	case "slat":
 		return service.TypeSlat
 	case "smokesensor":
@@ -87,6 +94,8 @@ func ServiceType(t string) string {
 		return service.TypeTimeInformation
 	case "tunneledbtleaccessoryservice":
 		return service.TypeTunneledBTLEAccessoryService
+	case "valve":
+		return service.TypeValve
 	case "window":
 		return service.TypeWindow
 	case "windowcovering":
