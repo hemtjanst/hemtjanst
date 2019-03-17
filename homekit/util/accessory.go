@@ -68,7 +68,7 @@ func AccessoryType(t string) accessory.AccessoryType {
 	case "airconditioner":
 		return accessory.TypeAirConditioner
 	case "humidifer":
-		return accessory.TypeHumidifer
+		return accessory.TypeHumidifier
 	case "dehumidifier":
 		return accessory.TypeDehumidifier
 	default:

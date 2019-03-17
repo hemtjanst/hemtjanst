@@ -2,10 +2,11 @@ package bridge
 
 import (
 	"context"
-	"github.com/brutella/dnssd"
-	"github.com/brutella/hc/log"
 	"net"
 	"strings"
+
+	"github.com/brutella/dnssd"
+	"github.com/brutella/hc/log"
 )
 
 // MDNSService represents a mDNS service.
@@ -28,7 +29,14 @@ func newService(config *Config) dnssd.Service {
 		ips = append(ips, ip)
 	}
 
-	service := dnssd.NewService(stripped, "_hap._tcp.", "local.", "", ips, config.servePort)
+	sdConfig := dnssd.Config{
+		Name:   stripped,
+		Type:   "_hap._tcp",
+		Domain: "local",
+		IPs:    ips,
+		Port:   config.servePort,
+	}
+	service, _ := dnssd.NewService(sdConfig)
 	service.Text = config.txtRecords()
 
 	return service
@@ -59,7 +67,15 @@ func (s *MDNSService) Publish(ctx context.Context) error {
 		ips = append(ips, ip)
 	}
 
-	service := dnssd.NewService(stripped, "_hap._tcp.", "local.", "", ips, s.config.servePort)
+	sdConfig := dnssd.Config{
+		Name:   stripped,
+		Type:   "_hap._tcp",
+		Domain: "local",
+		IPs:    ips,
+		Port:   s.config.servePort,
+	}
+
+	service, _ := dnssd.NewService(sdConfig)
 	service.Text = s.config.txtRecords()
 	handle, err := s.responder.Add(service)
 	if err != nil {
