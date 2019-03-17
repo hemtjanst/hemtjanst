@@ -1,8 +1,9 @@
 package messaging
 
 import (
-	mq "github.com/eclipse/paho.mqtt.golang"
 	"time"
+
+	mq "github.com/eclipse/paho.mqtt.golang"
 )
 
 // TestingMessenger is a no-op messenger useful for when running tests
@@ -54,7 +55,8 @@ type TestingMQTTClient struct {
 
 // TestingMQTTClient can be used in place of an mq.Client. It is meant to be
 // used in tests
-func (m *TestingMQTTClient) IsConnected() bool { return m.ConnectionState }
+func (m *TestingMQTTClient) IsConnected() bool      { return m.ConnectionState }
+func (m *TestingMQTTClient) IsConnectionOpen() bool { return m.ConnectionState }
 func (m *TestingMQTTClient) Connect() mq.Token {
 	m.ConnectionState = true
 	return &TestingMQTTToken{}
@@ -73,3 +75,6 @@ func (m *TestingMQTTClient) Unsubscribe(topics ...string) mq.Token {
 	return &TestingMQTTToken{}
 }
 func (m *TestingMQTTClient) AddRoute(topic string, callback mq.MessageHandler) {}
+func (m *TestingMQTTClient) OptionsReader() mq.ClientOptionsReader {
+	return mq.ClientOptionsReader{}
+}

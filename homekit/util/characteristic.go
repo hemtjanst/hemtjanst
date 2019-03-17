@@ -1,11 +1,12 @@
 package util
 
 import (
+	"strings"
+
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/service"
 	ht_char "github.com/hemtjanst/hemtjanst/homekit/characteristic"
-	"strings"
 )
 
 func FindCharacteristic(a *accessory.Accessory, cType string) *characteristic.Characteristic {
@@ -45,8 +46,6 @@ func GetReachability(a *accessory.Accessory) bool {
 func CharacteristicType(t string) *characteristic.Characteristic {
 	switch strings.ToLower(t) {
 	// Allow both contactSensorState and state
-	case "contactsensorstate", "state":
-		return characteristic.NewContactSensorState().Characteristic
 	case "accessoryflags":
 		return characteristic.NewAccessoryFlags().Characteristic
 	case "accessoryidentifier":
@@ -91,6 +90,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewConfigureBridgedAccessory().Characteristic
 	case "configurebridgedaccessorystatus":
 		return characteristic.NewConfigureBridgedAccessoryStatus().Characteristic
+	case "contactsensorstate", "state":
+		return characteristic.NewContactSensorState().Characteristic
 	case "coolingthresholdtemperature":
 		return characteristic.NewCoolingThresholdTemperature().Characteristic
 	case "currentairpurifierstate":
@@ -151,6 +152,10 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewImageMirroring().Characteristic
 	case "imagerotation":
 		return characteristic.NewImageRotation().Characteristic
+	case "inuse":
+		return characteristic.NewInUse().Characteristic
+	case "isconfigured":
+		return characteristic.NewIsConfigured().Characteristic
 	case "leakdetected":
 		return characteristic.NewLeakDetected().Characteristic
 	case "linkquality":
@@ -213,12 +218,16 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewProgrammableSwitchEvent().Characteristic
 	case "programmableswitchoutputstate":
 		return characteristic.NewProgrammableSwitchOutputState().Characteristic
+	case "programmode":
+		return characteristic.NewProgramMode().Characteristic
 	case "reachable":
 		return characteristic.NewReachable().Characteristic
 	case "relativehumiditydehumidifierthreshold":
 		return characteristic.NewRelativeHumidityDehumidifierThreshold().Characteristic
 	case "relativehumidityhumidifierthreshold":
 		return characteristic.NewRelativeHumidityHumidifierThreshold().Characteristic
+	case "remainingduration":
+		return characteristic.NewRemainingDuration().Characteristic
 	case "resetfilterindication":
 		return characteristic.NewResetFilterIndication().Characteristic
 	case "rotationdirection":
@@ -233,10 +242,18 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewSecuritySystemCurrentState().Characteristic
 	case "securitysystemtargetstate":
 		return characteristic.NewSecuritySystemTargetState().Characteristic
+	case "selectedrtpstreamconfiguration":
+		return characteristic.NewSelectedRTPStreamConfiguration().Characteristic
 	case "selectedstreamconfiguration":
 		return characteristic.NewSelectedStreamConfiguration().Characteristic
 	case "serialnumber":
 		return characteristic.NewSerialNumber().Characteristic
+	case "servicelabelindex":
+		return characteristic.NewServiceLabelIndex().Characteristic
+	case "servicelabelnamespace":
+		return characteristic.NewServiceLabelNamespace().Characteristic
+	case "setduration":
+		return characteristic.NewSetDuration().Characteristic
 	case "setupendpoints":
 		return characteristic.NewSetupEndpoints().Characteristic
 	case "slattype":
@@ -307,6 +324,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewTunneledAccessoryConnected().Characteristic
 	case "tunneledaccessorystatenumber":
 		return characteristic.NewTunneledAccessoryStateNumber().Characteristic
+	case "valvetype":
+		return characteristic.NewValveType().Characteristic
 	case "version":
 		return characteristic.NewVersion().Characteristic
 	case "vocdensity":

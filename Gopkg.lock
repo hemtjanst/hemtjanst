@@ -11,13 +11,13 @@
   revision = "5312a61534124124185d41f09206b9fef1d88403"
 
 [[projects]]
-  branch = "master"
   name = "github.com/brutella/dnssd"
   packages = [
     ".",
     "log"
   ]
-  revision = "75c3c0c65b2b195ff1805209b88907db71aad88f"
+  revision = "c8cbe29bf778a199399b13ca018315025d4b4b7f"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
@@ -41,7 +41,7 @@
     "service",
     "util"
   ]
-  revision = "b50d8bf0877cdac0b9d115c40828be5bc21d33b0"
+  revision = "0f65b422af04fb8e80a8162a3334a7d632e7fa53"
 
 [[projects]]
   branch = "master"
@@ -50,7 +50,7 @@
     ".",
     "packets"
   ]
-  revision = "750c97f293745e8220737ef933da2ec829d2fddd"
+  revision = "ba971f185f1bce82b0e8d19c74da95e37c68234a"
 
 [[projects]]
   branch = "master"
@@ -61,8 +61,8 @@
 [[projects]]
   name = "github.com/miekg/dns"
   packages = ["."]
-  revision = "5ec25f2a5044291b6c8abf43ed8a201da241e69e"
-  version = "v1.0.3"
+  revision = "cc8cd02140663157ce797c6650488d6c8563f31f"
+  version = "v1.1.6"
 
 [[projects]]
   name = "github.com/satori/go.uuid"
@@ -86,9 +86,10 @@
     "ed25519/internal/edwards25519",
     "hkdf",
     "internal/chacha20",
+    "internal/subtle",
     "poly1305"
   ]
-  revision = "13931e22f9e72ea58bb73048bc752b48c6d4d4ac"
+  revision = "a1f597ede03a7bef967a422b5b3a5bd08805a01e"
 
 [[projects]]
   branch = "master"
@@ -97,12 +98,22 @@
     "bpf",
     "internal/iana",
     "internal/socket",
+    "internal/socks",
     "ipv4",
     "ipv6",
     "proxy",
     "websocket"
   ]
-  revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
+  revision = "9f648a60d9775ef5c977e7669d1673a7a67bef33"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = [
+    "cpu",
+    "unix"
+  ]
+  revision = "a2f829d7f35f2ed1c3520c553a6226495455cae0"
 
 [solve-meta]
   analyzer-name = "dep"
