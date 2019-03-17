@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"sync"
+	"time"
 	_ "time"
 
 	"github.com/brutella/dnssd"
@@ -25,7 +26,6 @@ type ipTransport struct {
 	context hap.Context
 	server  http.Server
 	mutex   *sync.Mutex
-	mdns    *MDNSService
 
 	storage  util.Storage
 	database db.Database
@@ -159,20 +159,20 @@ func (t *ipTransport) Start() {
 
 	mdnsStop := make(chan struct{})
 	go func() {
+		defer close(mdnsStop)
 		t.responder.Respond(mdnsCtx)
 		log.Debug.Println("mdns responder stopped")
-		mdnsStop <- struct{}{}
 	}()
 
-	// keepAliveCtx, keepAliveCancel := context.WithCancel(t.ctx)
-	// defer keepAliveCancel()
-	//
-	// // Send keep alive notifications to all connected clients every 10 minutes
-	// keepAlive := hap.NewKeepAlive(10*time.Minute, t.context)
-	// go func() {
-	// 	keepAlive.Start(keepAliveCtx)
-	// 	log.Info.Println("Keep alive stopped")
-	// }()
+	keepAliveCtx, keepAliveCancel := context.WithCancel(t.ctx)
+	defer keepAliveCancel()
+
+	// Send keep alive notifications to all connected clients every 10 minutes
+	keepAlive := hap.NewKeepAlive(10*time.Minute, t.context)
+	go func() {
+		keepAlive.Start(keepAliveCtx)
+		log.Info.Println("Keep alive stopped")
+	}()
 
 	// Publish accessory ip
 	log.Info.Printf("Accessory address is %s:%s\n", t.config.IP, s.Port())
@@ -181,9 +181,9 @@ func (t *ipTransport) Start() {
 	defer serverCancel()
 	serverStop := make(chan struct{})
 	go func() {
+		defer close(serverStop)
 		s.ListenAndServe(serverCtx)
 		log.Debug.Println("server stopped")
-		serverStop <- struct{}{}
 	}()
 
 	// Wait until mdns responder and server stopped
@@ -283,7 +283,9 @@ func (t *ipTransport) Handle(ev interface{}) {
 func (t *ipTransport) updateConfig() {
 	t.config.updateConfigHash(t.container.ContentHash())
 	t.config.save(t.storage)
-	if t.mdns != nil {
-		t.mdns.Update()
+	if t.handle != nil {
+		txt := t.config.txtRecords()
+		t.handle.UpdateText(txt, t.responder)
+		log.Debug.Println(txt)
 	}
 }
