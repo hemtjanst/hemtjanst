@@ -19,7 +19,7 @@ import (
 
 var (
 	name     = flag.String("name", "hemtjanst", "Name of bridge instance")
-	addr     = flag.String("address", "127.0.0.1", "IP or hostname for Hemtjänst to bind on")
+	addr     = flag.String("address", "", "IP or hostname for Hemtjänst to bind on")
 	port     = flag.String("port", "12345", "Port for Hemtjänst to bind on")
 	pin      = flag.String("pin", "01020304", "Pairing pin for the HomeKit bridge")
 	dbPath   = flag.String("db.path", "./db", "Path to store the database with HomeKit key pairs etc.")
