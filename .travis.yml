@@ -25,7 +25,7 @@ before_install:
 install: go build ./...
 script: go test -race -v -coverprofile=profile.cov $(go list ./...)
 after_script:
-  - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash
   - go get github.com/mattn/goveralls
   - $GOPATH/bin/goveralls -coverprofile=profile.cov -service=travis-ci
-
+after_success:
+  - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash
