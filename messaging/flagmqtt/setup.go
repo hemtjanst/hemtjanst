@@ -60,7 +60,6 @@ func NewPersistentMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 	}
 
 	opts := mq.NewClientOptions().
-		AddBroker(fmt.Sprintf("tcp://%s", address)).
 		SetClientID(clientId).
 		SetConnectTimeout(time.Duration(connectionTimeout) * time.Second).
 		SetKeepAlive(time.Duration(keepAlive) * time.Second).
@@ -96,6 +95,9 @@ func NewPersistentMqtt(config ClientConfig) (mqttClient mq.Client, err error) {
 	}
 	if useTls {
 		opts.SetTLSConfig(tlsCfg)
+		opts.AddBroker(fmt.Sprintf("ssl://%s", address))
+	} else {
+		opts.AddBroker(fmt.Sprintf("tcp://%s", address))
 	}
 
 	return mq.NewClient(opts), nil
