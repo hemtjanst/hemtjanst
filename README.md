@@ -1,9 +1,9 @@
 # Hemtjänst
 
 Hemtjänst is:
-  * A Swedish word for home care or home service
-  * A specification of sorts on how devices should register with an MQTT broker
-  * An MQTT to HomeKit bridge
+* A Swedish word for home care or home service
+* A specification of sorts on how devices should register with an MQTT broker
+* An MQTT to HomeKit bridge
 
 This project was started so that a collection of $platform-to-MQTT bridges
 could be created or adapted that announce the devices they have in a similar
@@ -13,39 +13,16 @@ also be able to create bridges for other platforms, like SmartThings.
 
 ## Installation
 
-[`dep`](https://github.com/golang/dep) is used to manage the dependencies as a number of
-them have a habit of making backwards incompatible changes. You'll need to follow `dep`'s
-installation guide first.
+Using Go 1.12+ with modules support you can:
 
-After that you'll need to:
-* `mkdir -p $GOPATH/src/github.com/hemtjanst`
-* `cd $GOPATH/src/github.com/hemtjanst`
-* `git clone` the repo
-* `cd` into it
-* `dep ensure` to fetch the dependencies
-* `go build` to build the result or `go install`
+* `go install github.com/hemtjanst/hemtjanst`
 
 ## Development
 
-Follow the same instructions as install but either clone your fork into
-`$GOPATH/src/github.com/hemtjanst`, or if you already did a `go get`
-before you can update the `origin` remote in git to point to your fork instead.
+Using Go 1.12+ with modules support:
 
-For example:
-
-```
-git remote rename origin upstream
-git remote add origin git@github.com:your-workspace/your-fork.git
-```
-
-Or, if you cloned directly into the directory from your fork:
-
-```
-git remote add upstream git@github.com:hemtjanst/hemtjanst.git
-```
-
-Now if you want to pull in changes from `upstream`, i.e this repository you can
-`git fetch upstrseam` them and then `git merge upstream/master`, or whichever branch.
+* `git clone` this repo or your fork and `cd` into it
+* `go mod download`
 
 ## Usage
 
