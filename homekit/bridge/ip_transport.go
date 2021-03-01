@@ -3,10 +3,10 @@ package bridge
 import (
 	"bytes"
 	"context"
+	"image"
 	"io/ioutil"
 	"net"
 	"sync"
-	"time"
 	_ "time"
 
 	"github.com/brutella/dnssd"
@@ -15,6 +15,7 @@ import (
 	"github.com/brutella/hc/db"
 	"github.com/brutella/hc/event"
 	"github.com/brutella/hc/hap"
+	"github.com/brutella/hc/hap/endpoint"
 	"github.com/brutella/hc/hap/http"
 	"github.com/brutella/hc/log"
 	"github.com/brutella/hc/util"
@@ -22,9 +23,11 @@ import (
 )
 
 type ipTransport struct {
+	CameraSnapshotReq func(width, height uint) (*image.Image, error)
+
 	config  *Config
 	context hap.Context
-	server  http.Server
+	server  *http.Server
 	mutex   *sync.Mutex
 
 	storage  util.Storage
@@ -122,7 +125,7 @@ func NewIPTransport(config Config, a *accessory.Accessory, as ...*accessory.Acce
 		cfg.discoverable = false
 	}
 
-	cfg.categoryId = int(t.container.AccessoryType())
+	cfg.categoryId = uint8(t.container.AccessoryType())
 	cfg.updateConfigHash(t.container.ContentHash())
 	cfg.save(storage)
 
@@ -148,6 +151,10 @@ func (t *ipTransport) Start() {
 	s := http.NewServer(config)
 	t.server = s
 
+	if t.CameraSnapshotReq != nil {
+		t.server.Mux.Handle("/resource", endpoint.NewResource(t.context, t.CameraSnapshotReq))
+	}
+
 	// Publish server port which might be different then `t.config.Port`
 	t.config.servePort = int(to.Int64(s.Port()))
 
@@ -164,15 +171,15 @@ func (t *ipTransport) Start() {
 		log.Debug.Println("mdns responder stopped")
 	}()
 
-	keepAliveCtx, keepAliveCancel := context.WithCancel(t.ctx)
-	defer keepAliveCancel()
+	// keepAliveCtx, keepAliveCancel := context.WithCancel(t.ctx)
+	// defer keepAliveCancel()
 
-	// Send keep alive notifications to all connected clients every 10 minutes
-	keepAlive := hap.NewKeepAlive(10*time.Minute, t.context)
-	go func() {
-		keepAlive.Start(keepAliveCtx)
-		log.Info.Println("Keep alive stopped")
-	}()
+	// // Send keep alive notifications to all connected clients every 10 minutes
+	// keepAlive := hap.NewKeepAlive(10*time.Minute, t.context)
+	// go func() {
+	// 	keepAlive.Start(keepAliveCtx)
+	// 	log.Info.Println("Keep alive stopped")
+	// }()
 
 	// Publish accessory ip
 	log.Info.Printf("Accessory address is %s:%s\n", t.config.IP, s.Port())
@@ -181,9 +188,9 @@ func (t *ipTransport) Start() {
 	defer serverCancel()
 	serverStop := make(chan struct{})
 	go func() {
-		defer close(serverStop)
 		s.ListenAndServe(serverCtx)
 		log.Debug.Println("server stopped")
+		serverStop <- struct{}{}
 	}()
 
 	// Wait until mdns responder and server stopped
@@ -197,6 +204,10 @@ func (t *ipTransport) Stop() <-chan struct{} {
 	t.cancel()
 
 	return t.stopped
+}
+
+func (t *ipTransport) XHMURI() (string, error) {
+	return t.config.XHMURI(util.SetupFlagIP)
 }
 
 // isPaired returns true when the transport is already paired
@@ -228,16 +239,12 @@ func (t *ipTransport) addAccessory(a *accessory.Accessory) {
 			// all listeners are notified. Since we don't track which client is interested in
 			// which characteristic change event, we send them to all active connections.
 			onConnChange := func(conn net.Conn, c *characteristic.Characteristic, new, old interface{}) {
-				if c.Events == true {
-					t.notifyListener(a, c, conn)
-				}
+				t.notifyListener(a, c, conn)
 			}
 			c.OnValueUpdateFromConn(onConnChange)
 
 			onChange := func(c *characteristic.Characteristic, new, old interface{}) {
-				if c.Events == true {
-					t.notifyListener(a, c, nil)
-				}
+				t.notifyListener(a, c, nil)
 			}
 			c.OnValueUpdate(onChange)
 		}
@@ -250,6 +257,16 @@ func (t *ipTransport) notifyListener(a *accessory.Accessory, c *characteristic.C
 		if conn == except {
 			continue
 		}
+
+		sess := t.context.GetSessionForConnection(conn)
+		if sess == nil {
+			continue
+		}
+
+		if !sess.IsSubscribedTo(c) {
+			continue
+		}
+
 		resp, err := hap.NewCharacteristicNotification(a, c)
 		if err != nil {
 			log.Info.Panic(err)

@@ -9,16 +9,16 @@ import (
 	"github.com/brutella/hc/accessory"
 )
 
-func TopicToInt64(topic string) int64 {
+func TopicToUint64(topic string) uint64 {
 	sum := sha256.Sum256([]byte(topic))
-	return int64(binary.BigEndian.Uint64(append([]byte{0x0F}, sum[:7]...)))
+	return binary.BigEndian.Uint64(append([]byte{0x0F}, sum[:7]...))
 }
 
-func HexToInt64(hexStr string, def int64) int64 {
+func HexToUint64(hexStr string, def uint64) uint64 {
 	if b, err := hex.DecodeString(hexStr); err == nil {
-		var ret int64 = 0
+		var ret uint64 = 0
 		for i := len(b) - 1; i >= 0; i-- {
-			ret = ret<<8 + int64(b[i])
+			ret = ret<<8 + uint64(b[i])
 		}
 		// Static addition to avoid collision with auto-assigned ID:s
 		return ret + 0x100000000
