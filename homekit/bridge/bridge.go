@@ -39,7 +39,7 @@ func (b *bridge) AddAccessory(a *accessory.Accessory) {
 		id := a.ID
 		b.transport.addAccessory(a)
 		if id > 0 {
-			a.SetID(id)
+			a.ID = id
 		}
 		b.transport.updateConfig()
 	}
@@ -56,7 +56,7 @@ func (b *bridge) ReplaceAccessory(old, new *accessory.Accessory) {
 	if b.transport.container == nil {
 		return
 	}
-	var id int64
+	var id uint64
 	if old != nil {
 		id = old.ID
 		b.transport.container.RemoveAccessory(old)
@@ -66,7 +66,7 @@ func (b *bridge) ReplaceAccessory(old, new *accessory.Accessory) {
 	}
 	b.transport.addAccessory(new)
 	if id > 0 {
-		new.SetID(id)
+		new.ID = id
 	}
 	b.transport.updateConfig()
 }

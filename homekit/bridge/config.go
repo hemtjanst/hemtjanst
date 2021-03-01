@@ -1,6 +1,8 @@
 package bridge
 
 import (
+	"crypto/sha512"
+	"encoding/base64"
 	"fmt"
 	"reflect"
 
@@ -25,11 +27,14 @@ type Config struct {
 	// When empty, the pin 00102003 is used
 	Pin string
 
+	// SetupId used for setup code should be 4 uppercase letters
+	SetupId string
+
 	name         string // Accessory name
 	id           string // Accessory id
 	servePort    int    // Actual port the server listens at (might be differen than Port field)
 	version      int64  // Accessory content version (c#)
-	categoryId   int    // Accessory category (ci)
+	categoryId   uint8  // Accessory category (ci)
 	state        int64  // Accessory state (s#)
 	protocol     string // Protocol version, default 1.0 (pv)
 	discoverable bool   // Flag if accessory is discoverable (sf)
@@ -43,6 +48,7 @@ func defaultConfig(name string) *Config {
 		StoragePath:  name,
 		Pin:          "00102003", // default pin
 		Port:         "",         // empty string means that we get port from assigned by the system
+		SetupId:      "HOME",     // default setup id
 		name:         name,
 		id:           util.MAC48Address(util.RandomHexString()),
 		version:      1,
@@ -64,7 +70,22 @@ func (cfg Config) txtRecords() map[string]string {
 		"ff": fmt.Sprintf("%d", to.Int64(cfg.mfiCompliant)),
 		"md": cfg.name,
 		"ci": fmt.Sprintf("c%d", cfg.categoryId),
+		"sh": cfg.setupHash(),
 	}
+}
+
+func (cfg *Config) setupHash() string {
+	hashvalue := fmt.Sprintf("%s%s", cfg.SetupId, cfg.id)
+	sum := sha512.Sum512([]byte(hashvalue))
+	// use only first 4 bytes
+	code := []byte{sum[0], sum[1], sum[2], sum[3]}
+	encoded := base64.StdEncoding.EncodeToString(code)
+	return encoded
+}
+
+func (cfg *Config) XHMURI(flag util.SetupFlag) (string, error) {
+	flags := []util.SetupFlag{flag}
+	return util.XHMURI(cfg.Pin, cfg.SetupId, cfg.categoryId, flags)
 }
 
 // loads load the id, version and config hash

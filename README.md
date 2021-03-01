@@ -13,13 +13,13 @@ also be able to create bridges for other platforms, like SmartThings.
 
 ## Installation
 
-Using Go 1.12+ with modules support you can:
+Using Go 1.15+ with modules support you can:
 
 * `go install github.com/hemtjanst/hemtjanst`
 
 ## Development
 
-Using Go 1.12+ with modules support:
+Using Go 1.15+ with modules support:
 
 * `git clone` this repo or your fork and `cd` into it
 * `go mod download`

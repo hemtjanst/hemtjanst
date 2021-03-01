@@ -2,6 +2,10 @@ package homekit
 
 import (
 	"fmt"
+	"log"
+	"net"
+	"reflect"
+
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/service"
@@ -9,9 +13,6 @@ import (
 	"github.com/hemtjanst/hemtjanst/device"
 	"github.com/hemtjanst/hemtjanst/homekit/util"
 	"github.com/hemtjanst/hemtjanst/messaging"
-	"log"
-	"net"
-	"reflect"
 )
 
 type deviceHolder struct {
@@ -95,7 +96,7 @@ func (h *deviceHolder) createAccessory() (err error) {
 	dType := util.AccessoryType(h.device.Type)
 	a := accessory.New(info, dType)
 	h.accessory = a
-	a.ID = util.TopicToInt64(h.device.Topic)
+	a.ID = util.TopicToUint64(h.device.Topic)
 
 	return h.updateAccessory()
 }
@@ -172,9 +173,9 @@ func (h *deviceHolder) updateAccessory() (err error) {
 		for _, s := range h.accessory.GetServices() {
 			// There should never be multiple instances with the same type added to a device
 			// so it should be safe to set ID of service/characteristics to its type
-			s.ID = util.HexToInt64(s.Type, s.ID)
+			s.ID = util.HexToUint64(s.Type, s.ID)
 			for _, c := range s.GetCharacteristics() {
-				c.ID = util.HexToInt64(c.Type, c.ID)
+				c.ID = util.HexToUint64(c.Type, c.ID)
 			}
 		}
 	}
