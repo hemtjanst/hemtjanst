@@ -6,7 +6,6 @@ import (
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
 	"github.com/brutella/hc/service"
-	ht_char "github.com/hemtjanst/hemtjanst/homekit/characteristic"
 )
 
 func FindCharacteristic(a *accessory.Accessory, cType string) *characteristic.Characteristic {
@@ -45,13 +44,14 @@ func GetReachability(a *accessory.Accessory) bool {
 
 func CharacteristicType(t string) *characteristic.Characteristic {
 	switch strings.ToLower(t) {
-	// Allow both contactSensorState and state
 	case "accessoryflags":
 		return characteristic.NewAccessoryFlags().Characteristic
 	case "accessoryidentifier":
 		return characteristic.NewAccessoryIdentifier().Characteristic
 	case "active":
 		return characteristic.NewActive().Characteristic
+	case "activeidentifier":
+		return characteristic.NewActiveIdentifier().Characteristic
 	case "administratoronlyaccess":
 		return characteristic.NewAdministratorOnlyAccess().Characteristic
 	case "airparticulatedensity":
@@ -84,13 +84,17 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewCategory().Characteristic
 	case "chargingstate":
 		return characteristic.NewChargingState().Characteristic
+	case "closedcaptions":
+		return characteristic.NewClosedCaptions().Characteristic
 	case "colortemperature":
-		return ht_char.NewColorTemperature().Characteristic
+		return characteristic.NewColorTemperature().Characteristic
 	case "configurebridgedaccessory":
 		return characteristic.NewConfigureBridgedAccessory().Characteristic
 	case "configurebridgedaccessorystatus":
 		return characteristic.NewConfigureBridgedAccessoryStatus().Characteristic
-	case "contactsensorstate", "state":
+	case "configuredname":
+		return characteristic.NewConfiguredName().Characteristic
+	case "contactsensorstate":
 		return characteristic.NewContactSensorState().Characteristic
 	case "coolingthresholdtemperature":
 		return characteristic.NewCoolingThresholdTemperature().Characteristic
@@ -110,6 +114,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewCurrentHorizontalTiltAngle().Characteristic
 	case "currenthumidifierdehumidifierstate":
 		return characteristic.NewCurrentHumidifierDehumidifierState().Characteristic
+	case "currentmediastate":
+		return characteristic.NewCurrentMediaState().Characteristic
 	case "currentposition":
 		return characteristic.NewCurrentPosition().Characteristic
 	case "currentrelativehumidity":
@@ -124,6 +130,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewCurrentTime().Characteristic
 	case "currentverticaltiltangle":
 		return characteristic.NewCurrentVerticalTiltAngle().Characteristic
+	case "currentvisibilitystate":
+		return characteristic.NewCurrentVisibilityState().Characteristic
 	case "dayoftheweek":
 		return characteristic.NewDayOfTheWeek().Characteristic
 	case "digitalzoom":
@@ -132,6 +140,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewDiscoverBridgedAccessories().Characteristic
 	case "discoveredbridgedaccessories":
 		return characteristic.NewDiscoveredBridgedAccessories().Characteristic
+	case "displayorder":
+		return characteristic.NewDisplayOrder().Characteristic
 	case "filterchangeindication":
 		return characteristic.NewFilterChangeIndication().Characteristic
 	case "filterlifelevel":
@@ -146,6 +156,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewHoldPosition().Characteristic
 	case "hue":
 		return characteristic.NewHue().Characteristic
+	case "identifier":
+		return characteristic.NewIdentifier().Characteristic
 	case "identify":
 		return characteristic.NewIdentify().Characteristic
 	case "imagemirroring":
@@ -154,6 +166,10 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewImageRotation().Characteristic
 	case "inuse":
 		return characteristic.NewInUse().Characteristic
+	case "inputdevicetype":
+		return characteristic.NewInputDeviceType().Characteristic
+	case "inputsourcetype":
+		return characteristic.NewInputSourceType().Characteristic
 	case "isconfigured":
 		return characteristic.NewIsConfigured().Characteristic
 	case "leakdetected":
@@ -208,18 +224,22 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewPairingFeatures().Characteristic
 	case "pairingpairings":
 		return characteristic.NewPairingPairings().Characteristic
-	case "pm10density":
-		return characteristic.NewPM10Density().Characteristic
+	case "picturemode":
+		return characteristic.NewPictureMode().Characteristic
 	case "pm2_5density":
 		return characteristic.NewPM2_5Density().Characteristic
+	case "pm10density":
+		return characteristic.NewPM10Density().Characteristic
 	case "positionstate":
 		return characteristic.NewPositionState().Characteristic
+	case "powermodeselection":
+		return characteristic.NewPowerModeSelection().Characteristic
+	case "programmode":
+		return characteristic.NewProgramMode().Characteristic
 	case "programmableswitchevent":
 		return characteristic.NewProgrammableSwitchEvent().Characteristic
 	case "programmableswitchoutputstate":
 		return characteristic.NewProgrammableSwitchOutputState().Characteristic
-	case "programmode":
-		return characteristic.NewProgramMode().Characteristic
 	case "reachable":
 		return characteristic.NewReachable().Characteristic
 	case "relativehumiditydehumidifierthreshold":
@@ -228,6 +248,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewRelativeHumidityHumidifierThreshold().Characteristic
 	case "remainingduration":
 		return characteristic.NewRemainingDuration().Characteristic
+	case "remotekey":
+		return characteristic.NewRemoteKey().Characteristic
 	case "resetfilterindication":
 		return characteristic.NewResetFilterIndication().Characteristic
 	case "rotationdirection":
@@ -242,6 +264,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewSecuritySystemCurrentState().Characteristic
 	case "securitysystemtargetstate":
 		return characteristic.NewSecuritySystemTargetState().Characteristic
+	case "selectedcamerarecordingconfiguration":
+		return characteristic.NewSelectedCameraRecordingConfiguration().Characteristic
 	case "selectedrtpstreamconfiguration":
 		return characteristic.NewSelectedRTPStreamConfiguration().Characteristic
 	case "selectedstreamconfiguration":
@@ -258,6 +282,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewSetupEndpoints().Characteristic
 	case "slattype":
 		return characteristic.NewSlatType().Characteristic
+	case "sleepdiscoverymode":
+		return characteristic.NewSleepDiscoveryMode().Characteristic
 	case "smokedetected":
 		return characteristic.NewSmokeDetected().Characteristic
 	case "softwarerevision":
@@ -276,10 +302,16 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewStreamingStatus().Characteristic
 	case "sulphurdioxidedensity":
 		return characteristic.NewSulphurDioxideDensity().Characteristic
+	case "supportedaudiorecordingconfiguration":
+		return characteristic.NewSupportedAudioRecordingConfiguration().Characteristic
 	case "supportedaudiostreamconfiguration":
 		return characteristic.NewSupportedAudioStreamConfiguration().Characteristic
+	case "supportedcamerarecordingconfiguration":
+		return characteristic.NewSupportedCameraRecordingConfiguration().Characteristic
 	case "supportedrtpconfiguration":
 		return characteristic.NewSupportedRTPConfiguration().Characteristic
+	case "supportedvideorecordingconfiguration":
+		return characteristic.NewSupportedVideoRecordingConfiguration().Characteristic
 	case "supportedvideostreamconfiguration":
 		return characteristic.NewSupportedVideoStreamConfiguration().Characteristic
 	case "swingmode":
@@ -300,6 +332,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewTargetHorizontalTiltAngle().Characteristic
 	case "targethumidifierdehumidifierstate":
 		return characteristic.NewTargetHumidifierDehumidifierState().Characteristic
+	case "targetmediastate":
+		return characteristic.NewTargetMediaState().Characteristic
 	case "targetposition":
 		return characteristic.NewTargetPosition().Characteristic
 	case "targetrelativehumidity":
@@ -312,6 +346,8 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewTargetTiltAngle().Characteristic
 	case "targetverticaltiltangle":
 		return characteristic.NewTargetVerticalTiltAngle().Characteristic
+	case "targetvisibilitystate":
+		return characteristic.NewTargetVisibilityState().Characteristic
 	case "temperaturedisplayunits":
 		return characteristic.NewTemperatureDisplayUnits().Characteristic
 	case "timeupdate":
@@ -332,6 +368,10 @@ func CharacteristicType(t string) *characteristic.Characteristic {
 		return characteristic.NewVOCDensity().Characteristic
 	case "volume":
 		return characteristic.NewVolume().Characteristic
+	case "volumecontroltype":
+		return characteristic.NewVolumeControlType().Characteristic
+	case "volumeselector":
+		return characteristic.NewVolumeSelector().Characteristic
 	case "waterlevel":
 		return characteristic.NewWaterLevel().Characteristic
 	default:

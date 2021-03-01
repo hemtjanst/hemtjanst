@@ -22,6 +22,8 @@ func ServiceType(t string) string {
 		return service.TypeBridgingState
 	case "cameracontrol":
 		return service.TypeCameraControl
+	case "camerarecordingmanagement":
+		return service.TypeCameraRecordingManagement
 	case "camerartpstreammanagement":
 		return service.TypeCameraRTPStreamManagement
 	case "carbondioxidesensor":
@@ -50,6 +52,8 @@ func ServiceType(t string) string {
 		return service.TypeHumidifierDehumidifier
 	case "humiditysensor":
 		return service.TypeHumiditySensor
+	case "inputsource":
+		return service.TypeInputSource
 	case "irrigationsystem":
 		return service.TypeIrrigationSystem
 	case "leaksensor":
@@ -86,6 +90,8 @@ func ServiceType(t string) string {
 		return service.TypeStatelessProgrammableSwitch
 	case "switch":
 		return service.TypeSwitch
+	case "television":
+		return service.TypeTelevision
 	case "temperaturesensor":
 		return service.TypeTemperatureSensor
 	case "thermostat":
